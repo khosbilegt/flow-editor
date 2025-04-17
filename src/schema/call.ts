@@ -11,7 +11,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       name: "Agent ID",
       type: "dropdown",
       valueType: "api",
-      apiEndpoint: "/api/agents",
+      apiPath: "/api/agents",
       expression: "",
       condition: {
         field: "transferType",
@@ -21,7 +21,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
     queueId: {
       name: "Queue ID",
       type: "dropdown",
-      apiEndpoint: "/api/queues",
+      apiPath: "/api/queues",
       valueType: "api",
       expression: "",
       condition: {
@@ -40,9 +40,19 @@ const CallTransferCommandSchema: BaseCommandSchema = {
         name: "Media File",
         type: "dropdown",
         valueType: "api",
-        apiEndpoint: "/api/audio",
+        apiPath: "/api/audio",
         expression: "",
       },
+    },
+  },
+  edges: {
+    onTimeout: {
+      name: "onTimeout",
+      color: "#00FF00",
+    },
+    onFailure: {
+      name: "onFailure",
+      color: "#FF0000",
     },
   },
 };
@@ -73,69 +83,21 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
         name: "Media File",
         type: "dropdown",
         valueType: "api",
-        apiEndpoint: "/api/audio",
+        apiPath: "/api/audio",
         expression: "",
       },
     },
   },
-};
-
-const RestAPICommandSchema: BaseCommandSchema = {
-  command: "RestAPICommand",
-  fields: {
-    dataObjectId: {
-      name: "Data Object ID",
-      type: "dropdown",
-      valueType: "api",
-      apiEndpoint: "/api/data-objects",
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#00FF00",
     },
-    type: {
-      name: "HTTP Method",
-      type: "dropdown",
-      valueType: "static",
-      values: {
-        GET: "GET",
-        POST: "POST",
-        PUT: "PUT",
-        DELETE: "DELETE",
-        PATCH: "PATCH",
-      },
-    },
-    authorization: {
-      name: "Authorization Type",
-      type: "dropdown",
-      valueType: "static",
-      values: {
-        none: "None",
-        basic: "Basic",
-        bearer: "Bearer",
-      },
-    },
-    queryParams: {
-      name: "Query Parameters",
-      type: "array",
-      items: {
-        name: "Query Parameter",
-        type: "string",
-      },
-    },
-    pathParams: {
-      name: "Path Parameters",
-      type: "array",
-      items: {
-        name: "Path Parameter",
-        type: "string",
-      },
-    },
-    body: {
-      name: "Body",
-      type: "object",
+    onFailure: {
+      name: "onFailure",
+      color: "#FF0000",
     },
   },
 };
 
-export {
-  CallTransferCommandSchema,
-  PlayMediaCommandSchema,
-  RestAPICommandSchema,
-};
+export { CallTransferCommandSchema, PlayMediaCommandSchema };
