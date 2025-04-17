@@ -50,7 +50,16 @@ export default memo(
             </Flex>
           }
           title={"Random Name"}
-          description={schema?.command}
+          description={
+            <Flex vertical style={{ width: "100%" }}>
+              <Flex align="flex-end" vertical style={{ width: "100%" }}>
+                {Object.keys(schema.edges || {}).map((key, index) => {
+                  const edge = schema.edges?.[key] as SchemaEdge;
+                  return <Flex key={index}>{edge.name}</Flex>;
+                })}
+              </Flex>
+            </Flex>
+          }
         />
         <Handle type="target" position={Position.Left} />
         <Flex vertical gap={10}>
@@ -63,10 +72,11 @@ export default memo(
                 id={edge.name}
                 position={Position.Right}
                 style={{
+                  position: "absolute",
                   height: 8,
                   width: 8,
                   background: schema?.edges ? schema?.edges[key]?.color : "",
-                  marginTop: 15 * index,
+                  top: 65 + index * 22,
                 }}
               />
             );
