@@ -106,7 +106,7 @@ function FlowEditor() {
         attributionPosition="bottom-right"
       >
         <Background />
-        <MiniMap />
+        <MiniMap position={"bottom-center"} />
         <Controls />
       </ReactFlow>
     </ReactFlowProvider>

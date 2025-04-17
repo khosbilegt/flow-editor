@@ -16,7 +16,7 @@ export type FlowNodeData = {
 };
 
 export default memo(
-  ({ id, data: { schema, deleteNode } }: NodeProps<Node<FlowNodeData>>) => {
+  ({ id: id, data: { schema, deleteNode } }: NodeProps<Node<FlowNodeData>>) => {
     return (
       <Card
         style={{
@@ -29,7 +29,9 @@ export default memo(
             okText="Yes"
             cancelText="No"
             title="Are you sure you want to delete this node?"
-            onConfirm={() => deleteNode(id)}
+            onConfirm={() => {
+              deleteNode(id);
+            }}
           >
             <DeleteOutlined key={"delete"} style={{ color: "red" }} />
           </Popconfirm>,

@@ -1,17 +1,28 @@
-import { Button, Flex, Input, Layout, Typography } from "antd";
+import {
+  Button,
+  Flex,
+  FloatButton,
+  Input,
+  Layout,
+  Select,
+  Typography,
+} from "antd";
 import FlowEditor from "../components/FlowEditor";
 import "@xyflow/react/dist/style.css";
 import {
+  SaveOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
 } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const { Header, Content, Sider } = Layout;
 
 const { Title } = Typography;
 
-function App() {
+function EditorLayout() {
+  const keyboardListenerInitialized = useRef(false);
+
   const [isTaskAscending, setTaskAscending] = useState(false);
   const [handlers, setHandlers] = useState([
     {
@@ -41,6 +52,28 @@ function App() {
     setTaskAscending(!ascending);
   };
 
+  const save = () => {
+    console.log("Save triggered");
+  };
+
+  useEffect(() => {
+    if (keyboardListenerInitialized.current) return;
+    keyboardListenerInitialized.current = true;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        save();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown, true);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <Layout style={{ height: "100vh", width: "100vw" }}>
       <Header
@@ -59,6 +92,8 @@ function App() {
           </Title>
         </Flex>
         <Flex align="center" gap={10}>
+          <Select placeholder="Version" style={{ width: "150px" }} />
+          <Select placeholder="Initial Handler" style={{ width: "150px" }} />
           <Button type="primary">Save</Button>
           <Button danger>Deploy</Button>
         </Flex>
@@ -93,16 +128,22 @@ function App() {
         </Sider>
         <Content
           style={{
-            margin: "15px",
+            marginLeft: "15px",
             border: "2px solid black",
             borderRadius: "12px",
           }}
         >
           <FlowEditor />
+          <FloatButton
+            type="primary"
+            onClick={() => save()}
+            style={{ width: "50px", height: "50px" }}
+            icon={<SaveOutlined height={100} width={100} />}
+          />
         </Content>
       </Layout>
     </Layout>
   );
 }
 
-export default App;
+export default EditorLayout;
