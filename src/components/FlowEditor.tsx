@@ -43,28 +43,48 @@ const initialNodes: Node<FlowNodeData>[] = [
   },
 ];
 
-const initialEdges: Edge[] = [
-  {
-    id: "e1-2",
-    source: "3",
-    sourceHandle: "onSuccess",
-    target: "2",
-    type: "flow",
-  },
-];
-
 const edgeTypes = {
   flow: FlowEdge,
 };
 
 function FlowEditor() {
-  const [nodes, _, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((els) => addEdge(params, els)),
+  const removeEdge = useCallback(
+    (id: string) => setEdges((els) => els.filter((edge) => edge.id !== id)),
     []
   );
+
+  const onConnect = useCallback(
+    (params: Connection) =>
+      setEdges((els) =>
+        addEdge(
+          {
+            ...params,
+            type: "flow",
+            data: {
+              removeEdge: removeEdge,
+            },
+          },
+          els
+        )
+      ),
+    []
+  );
+
+  const initialEdges: Edge[] = [
+    {
+      id: "e1-2",
+      source: "3",
+      sourceHandle: "onSuccess",
+      target: "2",
+      type: "flow",
+      data: {
+        removeEdge: removeEdge,
+      },
+    },
+  ];
+
+  const [nodes, _, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   return (
     <ReactFlowProvider>

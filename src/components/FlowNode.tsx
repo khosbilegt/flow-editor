@@ -21,16 +21,9 @@ export default memo(({ data }: NodeProps<Node<FlowNodeData>>) => {
         padding: "0px",
         boxShadow: "0 0 3px rgba(0, 0, 0, 0.4)",
       }}
-      styles={{
-        actions: {
-          height: "100%",
-          // background: "red",
-          padding: "0px",
-        },
-      }}
       actions={[
         <SettingOutlined key={"settings"} />,
-        <DeleteOutlined key={"delete"} />,
+        <DeleteOutlined key={"delete"} style={{ color: "red" }} />,
       ]}
     >
       <Meta
@@ -58,6 +51,14 @@ export default memo(({ data }: NodeProps<Node<FlowNodeData>>) => {
               type="source"
               id={edge.name}
               position={Position.Right}
+              style={{
+                height: 8,
+                width: 8,
+                background: data.schema?.edges
+                  ? data.schema?.edges[key]?.color
+                  : "",
+                marginTop: 15 * index,
+              }}
             />
           );
         })}

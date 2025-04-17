@@ -94,15 +94,15 @@ const RestAPICommandSchema: BaseCommandSchema = {
   edges: {
     onSuccess: {
       name: "onSuccess",
-      color: "#00FF00",
+      color: "#389E0D",
     },
     onTimeout: {
       name: "onTimeout",
-      color: "#00FF00",
+      color: "#FAAD14",
     },
     onFailure: {
       name: "onFailure",
-      color: "#FF0000",
+      color: "#D32029",
     },
   },
 };

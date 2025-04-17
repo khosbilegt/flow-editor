@@ -1,4 +1,4 @@
-import { DeleteOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined } from "@ant-design/icons";
 import {
   BaseEdge,
   EdgeLabelRenderer,
@@ -7,6 +7,10 @@ import {
 } from "@xyflow/react";
 import { Button, Flex } from "antd";
 
+type FlowEdgeData = {
+  removeEdge: (id: string) => void;
+};
+
 export default function FlowEdge({
   id,
   sourceX,
@@ -14,7 +18,7 @@ export default function FlowEdge({
   targetX,
   targetY,
   data,
-}: EdgeProps) {
+}: EdgeProps & { data: FlowEdgeData }) {
   const [edgePath, labelX, labelY] = getSimpleBezierPath({
     sourceX,
     sourceY,
@@ -40,7 +44,15 @@ export default function FlowEdge({
             pointerEvents: "all",
           }}
         >
-          <Button danger icon={<DeleteOutlined />} size="small" />
+          <Button
+            style={{ padding: 5, color: "red" }}
+            danger
+            onClick={() => {
+              data?.removeEdge(id);
+            }}
+          >
+            <CloseCircleOutlined />
+          </Button>
         </Flex>
       </EdgeLabelRenderer>
     </>
