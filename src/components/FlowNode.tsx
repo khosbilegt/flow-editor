@@ -1,14 +1,11 @@
 import { memo } from "react";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
-import { Card, Flex, Popconfirm } from "antd";
+import { Card, Flex, Popconfirm, Typography } from "antd";
 import { BaseCommandSchema, SchemaEdge } from "../schema/generic";
-import {
-  DeleteOutlined,
-  PhoneOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, SettingOutlined } from "@ant-design/icons";
 
 const { Meta } = Card;
+const { Text } = Typography;
 
 export type FlowNodeData = {
   schema: BaseCommandSchema;
@@ -38,24 +35,18 @@ export default memo(
         ]}
       >
         <Meta
-          avatar={
-            <Flex
-              style={{
-                height: "100%",
-                alignContent: "center",
-                justifyContent: "center",
-              }}
-            >
-              <PhoneOutlined style={{ fontSize: "20px" }} />
-            </Flex>
-          }
           title={"Random Name"}
           description={
             <Flex vertical style={{ width: "100%" }}>
+              <Text type="secondary">{schema.command}</Text>
               <Flex align="flex-end" vertical style={{ width: "100%" }}>
                 {Object.keys(schema.edges || {}).map((key, index) => {
                   const edge = schema.edges?.[key] as SchemaEdge;
-                  return <Flex key={index}>{edge.name}</Flex>;
+                  return (
+                    <Text key={index} type="secondary">
+                      {edge.name}
+                    </Text>
+                  );
                 })}
               </Flex>
             </Flex>
@@ -76,7 +67,7 @@ export default memo(
                   height: 8,
                   width: 8,
                   background: schema?.edges ? schema?.edges[key]?.color : "",
-                  top: 65 + index * 22,
+                  top: 85 + index * 22,
                 }}
               />
             );
