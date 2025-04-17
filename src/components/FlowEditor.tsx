@@ -22,27 +22,6 @@ const nodeTypes = {
   flow: FlowNode,
 };
 
-const initialNodes: Node<FlowNodeData>[] = [
-  {
-    id: "1",
-    position: { x: 0, y: 0 },
-    data: { schema: RestAPICommandSchema },
-    type: "flow",
-  },
-  {
-    id: "2",
-    position: { x: 500, y: 0 },
-    data: { schema: CallTransferCommandSchema },
-    type: "flow",
-  },
-  {
-    id: "3",
-    position: { x: 0, y: 250 },
-    data: { schema: RestAPICommandSchema },
-    type: "flow",
-  },
-];
-
 const edgeTypes = {
   flow: FlowEdge,
 };
@@ -69,6 +48,34 @@ function FlowEditor() {
       ),
     []
   );
+
+  const deleteNode = useCallback((id: string) => {
+    setEdges((els) =>
+      els.filter((edge) => edge.source !== id && edge.target !== id)
+    );
+    onNodesChange([{ type: "remove", id }]);
+  }, []);
+
+  const initialNodes: Node<FlowNodeData>[] = [
+    {
+      id: "1",
+      position: { x: 0, y: 0 },
+      data: { schema: RestAPICommandSchema, deleteNode: deleteNode },
+      type: "flow",
+    },
+    {
+      id: "2",
+      position: { x: 500, y: 0 },
+      data: { schema: CallTransferCommandSchema, deleteNode: deleteNode },
+      type: "flow",
+    },
+    {
+      id: "3",
+      position: { x: 0, y: 250 },
+      data: { schema: RestAPICommandSchema, deleteNode: deleteNode },
+      type: "flow",
+    },
+  ];
 
   const initialEdges: Edge[] = [
     {
