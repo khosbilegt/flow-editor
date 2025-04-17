@@ -10,6 +10,7 @@ type Dropdown = {
   apiEndpoint?: string;
   values?: Record<string, string>;
   condition?: Condition;
+  expression?: string;
 };
 
 type Field<T> =

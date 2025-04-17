@@ -12,6 +12,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       type: "dropdown",
       valueType: "api",
       apiEndpoint: "/api/agents",
+      expression: "",
       condition: {
         field: "transferType",
         equals: "AGENT",
@@ -22,6 +23,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       type: "dropdown",
       apiEndpoint: "/api/queues",
       valueType: "api",
+      expression: "",
       condition: {
         field: "transferType",
         equals: "QUEUE",
@@ -39,6 +41,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
         type: "dropdown",
         valueType: "api",
         apiEndpoint: "/api/audio",
+        expression: "",
       },
     },
   },
@@ -71,6 +74,7 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
         type: "dropdown",
         valueType: "api",
         apiEndpoint: "/api/audio",
+        expression: "",
       },
     },
   },
