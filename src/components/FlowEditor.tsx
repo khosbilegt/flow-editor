@@ -3,6 +3,7 @@ import {
   Background,
   Controls,
   Edge,
+  FinalConnectionState,
   MiniMap,
   Node,
   ReactFlow,
@@ -15,8 +16,9 @@ import { Connection } from "@xyflow/react";
 import { useCallback } from "react";
 import FlowNode, { type FlowNodeData } from "./FlowNode";
 import FlowEdge from "./FlowEdge";
-import { RestAPICommandSchema } from "../schema/generic";
+import { BaseCommandSchema, RestAPICommandSchema } from "../schema/generic";
 import { CallTransferCommandSchema } from "../schema/call";
+import { guidGenerator } from "../util/utils";
 
 const nodeTypes = {
   flow: FlowNode,
@@ -46,6 +48,58 @@ function FlowEditor() {
           els
         )
       ),
+    []
+  );
+
+  const onConnectEnd = useCallback(
+    (_: MouseEvent | TouchEvent, state: FinalConnectionState) => {
+      console.log(state);
+      if (!state.isValid) {
+        const id = guidGenerator();
+        addNode(
+          id,
+          {
+            x: state?.to?.x ? state?.to?.x - 50 : 0,
+            y: state?.to?.y ? state?.to?.y - 50 : 0,
+          },
+          RestAPICommandSchema
+        );
+        setEdges((els) =>
+          addEdge(
+            {
+              ...state,
+              id: id,
+              source: state?.fromNode?.id ? state?.fromNode?.id : "",
+              sourceHandle: state?.fromHandle?.id ? state?.fromHandle?.id : "",
+              target: id,
+              type: "flow",
+              data: {
+                removeEdge: removeEdge,
+              },
+            },
+            els
+          )
+        );
+      }
+    },
+    []
+  );
+
+  const addNode = useCallback(
+    (
+      id: string,
+      position: { x: number; y: number },
+      schema: BaseCommandSchema
+    ) => {
+      setNodes((els) =>
+        els.concat({
+          id,
+          position,
+          data: { schema, deleteNode: deleteNode },
+          type: "flow",
+        })
+      );
+    },
     []
   );
 
@@ -90,7 +144,7 @@ function FlowEditor() {
     },
   ];
 
-  const [nodes, _, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   return (
@@ -101,6 +155,7 @@ function FlowEditor() {
         edges={edges}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         attributionPosition="bottom-right"
