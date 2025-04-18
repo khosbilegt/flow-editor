@@ -1,6 +1,12 @@
 import { EditNodeData } from "@/schema/generic";
-import { Button, Flex, Form, Input, Select } from "antd";
+import { Button, Flex, Form } from "antd";
 import { useEffect, useState } from "react";
+import BooleanField from "./data/BooleanField";
+import NumberField from "./data/NumberField";
+import TextField from "./data/TextField";
+import DropdownField from "./data/DropdownField";
+import ArrayField from "./data/ArrayField";
+import ObjectField from "./data/ObjectField";
 
 function FlowData({
   editData,
@@ -11,14 +17,6 @@ function FlowData({
 }) {
   const [localData, setLocalData] = useState<any>(editData?.data);
 
-  useEffect(() => {
-    setLocalData(editData?.data);
-  }, [editData]);
-
-  useEffect(() => {
-    console.log(localData);
-  }, [localData]);
-
   const saveData = () => {
     console.log("saveData", localData);
     if (editData) {
@@ -26,6 +24,14 @@ function FlowData({
     }
     closeModal();
   };
+
+  useEffect(() => {
+    setLocalData(editData?.data);
+  }, [editData]);
+
+  useEffect(() => {
+    console.log(localData);
+  }, [localData]);
 
   return (
     <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
@@ -56,65 +62,62 @@ function FlowData({
           return (
             <Form.Item key={key} label={field.name}>
               {field.type === "string" && (
-                <Input
-                  type="text"
-                  onChange={(e) => {
+                <TextField
+                  value={localData[field.key]}
+                  setValue={(val: string) => {
                     setLocalData({
                       ...localData,
-                      [field.key]: e.target.value,
+                      [field.key]: val,
                     });
                   }}
                 />
               )}
               {field.type === "number" && (
-                <Input
-                  type="number"
-                  style={{ width: "400px" }}
+                <NumberField
                   value={localData[field.key]}
-                  onChange={(e) =>
+                  setValue={(val: number) => {
                     setLocalData({
                       ...localData,
-                      [field.key]: e.target.value,
-                    })
-                  }
+                      [field.key]: val,
+                    });
+                  }}
                 />
               )}
               {field.type === "boolean" && (
-                <Input
-                  type="checkbox"
-                  style={{ width: "400px" }}
+                <BooleanField
                   value={localData[field.key]}
-                  onChange={(e) =>
+                  setValue={(val: boolean) => {
                     setLocalData({
                       ...localData,
-                      [field.key]: e.target.checked,
-                    })
-                  }
+                      [field.key]: val,
+                    });
+                  }}
                 />
               )}
               {field.type === "dropdown" && (
-                <Select
-                  showSearch
+                <DropdownField
                   value={localData[field.key]}
-                  onChange={(value) =>
+                  setValue={(val: string) => {
                     setLocalData({
                       ...localData,
-                      [field.key]: value,
-                    })
-                  }
-                >
-                  {field.values &&
-                    Object.entries(field.values).map(([key, value]) => {
-                      return (
-                        <Select.Option key={key} value={key}>
-                          {value}
-                        </Select.Option>
-                      );
-                    })}
-                </Select>
+                      [field.key]: val,
+                    });
+                  }}
+                  dropdownValues={field?.values ? field.values : {}}
+                />
               )}
-              {field.type === "object" && <div>Object</div>}
-              {field.type === "array" && <div>Array</div>}
+              {field.type === "object" && <ObjectField />}
+              {field.type === "array" && (
+                <ArrayField
+                  items={localData.values}
+                  setItems={(items) => {
+                    setLocalData({
+                      ...localData,
+                      [field.key]: items,
+                    });
+                  }}
+                />
+              )}
             </Form.Item>
           );
         })}

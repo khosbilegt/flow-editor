@@ -9,12 +9,10 @@ import {
 } from "antd";
 import FlowEditor from "../components/FlowEditor";
 import "@xyflow/react/dist/style.css";
-import {
-  SaveOutlined,
-  SortAscendingOutlined,
-  SortDescendingOutlined,
-} from "@ant-design/icons";
+import { SaveOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
+
+const { Search } = Input;
 
 const { Header, Content, Sider } = Layout;
 
@@ -23,8 +21,7 @@ const { Title } = Typography;
 function EditorLayout() {
   const keyboardListenerInitialized = useRef(false);
 
-  const [isTaskAscending, setTaskAscending] = useState(false);
-  const [handlers, setHandlers] = useState([
+  const [handlers, _] = useState([
     {
       id: 1,
       name: "Handler 1",
@@ -39,18 +36,6 @@ function EditorLayout() {
     },
   ]);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const sortHandlers = (ascending: boolean) => {
-    const sortedHandlers = [...handlers].sort((a, b) => {
-      if (ascending) {
-        return a.name.localeCompare(b.name);
-      } else {
-        return b.name.localeCompare(a.name);
-      }
-    });
-    setHandlers(sortedHandlers);
-    setTaskAscending(!ascending);
-  };
 
   const save = () => {
     console.log("Save triggered");
@@ -93,29 +78,25 @@ function EditorLayout() {
         </Flex>
         <Flex align="center" gap={10}>
           <Select placeholder="Version" style={{ width: "150px" }} />
-          <Select placeholder="Initial Handler" style={{ width: "150px" }} />
-          <Button type="primary">Save</Button>
+          <Button type="primary">Clone</Button>
           <Button danger>Deploy</Button>
         </Flex>
       </Header>
       <Layout style={{ padding: "15px" }}>
         <Sider style={{ background: "none" }}>
           <Flex vertical gap={5}>
-            <Flex gap={5}>
-              <Input
-                placeholder="Search handler"
-                onChange={(e) => setSearchTerm(e?.target?.value)}
-              />
-              <Button onClick={() => sortHandlers(isTaskAscending)}>
-                {isTaskAscending ? (
-                  <SortAscendingOutlined />
-                ) : (
-                  <SortDescendingOutlined />
-                )}
-              </Button>
-            </Flex>
+            <Select placeholder="Initial Handler" style={{ width: "100%" }} />
+            <Search
+              placeholder="Search handler"
+              onChange={(e) => setSearchTerm(e?.target?.value)}
+              allowClear
+              enterButton
+            />
             {handlers.map((handler, index) => {
-              if (searchTerm && !handler.name.includes(searchTerm)) {
+              if (
+                searchTerm &&
+                !handler.name.toLowerCase().includes(searchTerm.toLowerCase())
+              ) {
                 return null;
               }
               return (

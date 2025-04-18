@@ -71,8 +71,8 @@ export default memo(
                 position={Position.Right}
                 style={{
                   position: "absolute",
-                  height: 8,
-                  width: 8,
+                  height: 12,
+                  width: 12,
                   background: schema?.edges ? schema?.edges[key]?.color : "",
                   top: 85 + index * 22,
                 }}

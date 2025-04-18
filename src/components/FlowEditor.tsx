@@ -65,8 +65,8 @@ function FlowEditor() {
         addNode(
           id,
           {
-            x: state?.to?.x ? state?.to?.x - 50 : 0,
-            y: state?.to?.y ? state?.to?.y - 50 : 0,
+            x: state?.to?.x ? state?.to?.x : 0,
+            y: state?.to?.y ? state?.to?.y : 0,
           },
           RestAPICommandSchema
         );
