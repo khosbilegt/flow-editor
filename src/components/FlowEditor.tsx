@@ -13,12 +13,18 @@ import {
 } from "@xyflow/react";
 
 import { Connection } from "@xyflow/react";
-import { useCallback } from "react";
-import FlowNode, { type FlowNodeData } from "./FlowNode";
-import FlowEdge from "./FlowEdge";
-import { BaseCommandSchema, RestAPICommandSchema } from "../schema/generic";
+import { useCallback, useState } from "react";
+import {
+  BaseCommandSchema,
+  EditNodeData,
+  RestAPICommandSchema,
+} from "../schema/generic";
 import { CallTransferCommandSchema } from "../schema/call";
 import { guidGenerator } from "../util/utils";
+import { Drawer } from "antd";
+import FlowNode, { type FlowNodeData } from "./FlowNode";
+import FlowEdge from "./FlowEdge";
+import FlowData from "./FlowData";
 
 const nodeTypes = {
   flow: FlowNode,
@@ -95,7 +101,7 @@ function FlowEditor() {
         els.concat({
           id,
           position,
-          data: { schema, deleteNode: deleteNode },
+          data: { schema, deleteNode: deleteNode, openNodeModal },
           type: "flow",
         })
       );
@@ -110,23 +116,44 @@ function FlowEditor() {
     onNodesChange([{ type: "remove", id }]);
   }, []);
 
+  const openNodeModal = (schema: BaseCommandSchema, id: string) => {
+    setEditData({
+      id: id,
+      schema: schema,
+      data: {},
+    });
+    setOpen(true);
+  };
+
   const initialNodes: Node<FlowNodeData>[] = [
     {
       id: "1",
       position: { x: 0, y: 0 },
-      data: { schema: RestAPICommandSchema, deleteNode: deleteNode },
+      data: {
+        schema: RestAPICommandSchema,
+        deleteNode,
+        openNodeModal,
+      },
       type: "flow",
     },
     {
       id: "2",
       position: { x: 500, y: 0 },
-      data: { schema: CallTransferCommandSchema, deleteNode: deleteNode },
+      data: {
+        schema: CallTransferCommandSchema,
+        deleteNode,
+        openNodeModal,
+      },
       type: "flow",
     },
     {
       id: "3",
       position: { x: 0, y: 250 },
-      data: { schema: RestAPICommandSchema, deleteNode: deleteNode },
+      data: {
+        schema: RestAPICommandSchema,
+        deleteNode,
+        openNodeModal,
+      },
       type: "flow",
     },
   ];
@@ -146,9 +173,24 @@ function FlowEditor() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [open, setOpen] = useState(false);
+  const [editData, setEditData] = useState<EditNodeData | null>(null);
+
+  const closeModal = () => {
+    setOpen(false);
+  };
 
   return (
     <ReactFlowProvider>
+      <Drawer
+        title={"Edit Command"}
+        placement="right"
+        open={open}
+        onClose={closeModal}
+        width={"40%"}
+      >
+        <FlowData editData={editData} closeModal={closeModal} />
+      </Drawer>
       <ReactFlow
         nodes={nodes}
         onNodesChange={onNodesChange}

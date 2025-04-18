@@ -1,9 +1,12 @@
 type Condition = {
   field: string;
-  equals: string | number | boolean;
+  type: "equals" | "regex";
+  equals?: string | number | boolean;
+  regex?: string;
 };
 
 type Dropdown = {
+  key: string;
   name: string;
   type: "dropdown";
   valueType: "api" | "static";
@@ -20,12 +23,14 @@ type SchemaEdge = {
 
 type Field =
   | {
+      key: string;
       name: string;
       type: "string" | "number" | "boolean" | "object";
       condition?: Condition;
     }
   | Dropdown
   | {
+      key: string;
       name: string;
       type: "array";
       items: Field;
@@ -38,10 +43,17 @@ interface BaseCommandSchema {
   edges?: Record<string, SchemaEdge>;
 }
 
+interface EditNodeData {
+  id: string;
+  schema: BaseCommandSchema;
+  data: any;
+}
+
 const RestAPICommandSchema: BaseCommandSchema = {
   command: "RestAPICommand",
   fields: {
     dataObjectId: {
+      key: "dataObjectId",
       name: "Data Object ID",
       type: "dropdown",
       valueType: "api",
@@ -49,6 +61,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
       expression: "",
     },
     type: {
+      key: "type",
       name: "HTTP Method",
       type: "dropdown",
       valueType: "static",
@@ -61,6 +74,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
       },
     },
     authorization: {
+      key: "authorization",
       name: "Authorization Type",
       type: "dropdown",
       valueType: "static",
@@ -71,24 +85,34 @@ const RestAPICommandSchema: BaseCommandSchema = {
       },
     },
     queryParams: {
+      key: "queryParams",
       name: "Query Parameters",
       type: "array",
       items: {
+        key: "queryParam",
         name: "Query Parameter",
         type: "string",
       },
     },
     pathParams: {
+      key: "pathParams",
       name: "Path Parameters",
       type: "array",
       items: {
+        key: "pathParam",
         name: "Path Parameter",
         type: "string",
       },
     },
     body: {
+      key: "body",
       name: "Body",
       type: "object",
+      condition: {
+        field: "type",
+        type: "regex",
+        regex: "POST|PUT|PATCH",
+      },
     },
   },
   edges: {
@@ -107,5 +131,12 @@ const RestAPICommandSchema: BaseCommandSchema = {
   },
 };
 
-export type { BaseCommandSchema, Field, Condition, Dropdown, SchemaEdge };
+export type {
+  BaseCommandSchema,
+  Field,
+  Condition,
+  Dropdown,
+  SchemaEdge,
+  EditNodeData,
+};
 export { RestAPICommandSchema };
