@@ -25,7 +25,13 @@ type Field =
   | {
       key: string;
       name: string;
-      itemType?: "string" | "number" | "boolean";
+      itemType?:
+        | "string"
+        | "number"
+        | "boolean"
+        | "object"
+        | "array"
+        | "dropdown";
       type: "string" | "number" | "boolean" | "object" | "array" | "text";
       condition?: Condition;
     }
@@ -34,7 +40,13 @@ type Field =
       key: string;
       name: string;
       type: "array" | "object";
-      itemType?: "string" | "number" | "boolean" | "object";
+      itemType?:
+        | "string"
+        | "number"
+        | "boolean"
+        | "object"
+        | "array"
+        | "dropdown";
       items: Field;
       condition?: Condition;
     };

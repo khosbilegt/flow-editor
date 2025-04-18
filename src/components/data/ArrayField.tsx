@@ -3,6 +3,7 @@ import { Button, Flex } from "antd";
 import StringField from "./StringField";
 import NumberField from "./NumberField";
 import BooleanField from "./BooleanField";
+import DropdownField from "./DropdownField";
 
 function ArrayField({
   itemType,
@@ -54,6 +55,20 @@ function ArrayField({
                   }}
                 />
               );
+            case "dropdown": {
+              return (
+                <DropdownField
+                  key={index}
+                  value={item}
+                  setValue={(value) => {
+                    const newItems = [...items];
+                    newItems[index] = value;
+                    setItems(newItems);
+                  }}
+                  dropdownValues={{ key1: "value1", key2: "value2" }}
+                />
+              );
+            }
             default:
               return null;
           }

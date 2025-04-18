@@ -48,6 +48,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       key: "ringingAudioList",
       name: "Ringing Audio List",
       type: "array",
+      itemType: "dropdown",
       items: {
         key: "mediaFile",
         name: "Media File",
@@ -97,6 +98,7 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
       key: "mediaList",
       name: "Media List",
       type: "array",
+      itemType: "dropdown",
       items: {
         key: "mediaFile",
         name: "Media File",

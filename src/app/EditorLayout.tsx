@@ -5,11 +5,12 @@ import {
   Input,
   Layout,
   Select,
+  Spin,
   Typography,
 } from "antd";
 import FlowEditor from "../components/FlowEditor";
 import "@xyflow/react/dist/style.css";
-import { SaveOutlined } from "@ant-design/icons";
+import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
 
 const { Search } = Input;
@@ -35,9 +36,14 @@ function EditorLayout() {
       name: "Handler 3",
     },
   ]);
+  const [isSaving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const save = () => {
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+    }, 2000);
     console.log("Save triggered");
   };
 
@@ -77,15 +83,20 @@ function EditorLayout() {
           </Title>
         </Flex>
         <Flex align="center" gap={10}>
-          <Select placeholder="Version" style={{ width: "150px" }} />
-          <Button type="primary">Clone</Button>
           <Button danger>Deploy</Button>
         </Flex>
       </Header>
       <Layout style={{ padding: "15px" }}>
         <Sider style={{ background: "none" }}>
           <Flex vertical gap={5}>
-            <Select placeholder="Initial Handler" style={{ width: "100%" }} />
+            <Flex justify="space-between" gap={5}>
+              <Select
+                placeholder="Version"
+                style={{ width: "100%" }}
+                value={"main"}
+              />
+              <Button type="primary" icon={<PlusOutlined />} />
+            </Flex>
             <Search
               placeholder="Search handler"
               onChange={(e) => setSearchTerm(e?.target?.value)}
@@ -116,10 +127,15 @@ function EditorLayout() {
         >
           <FlowEditor />
           <FloatButton
-            type="primary"
             onClick={() => save()}
             style={{ width: "50px", height: "50px" }}
-            icon={<SaveOutlined height={100} width={100} />}
+            icon={
+              isSaving ? (
+                <Spin size="small" />
+              ) : (
+                <SaveOutlined height={100} width={100} />
+              )
+            }
           />
         </Content>
       </Layout>

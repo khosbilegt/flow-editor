@@ -10,7 +10,6 @@ function BooleanField({
   return (
     <Input
       type="checkbox"
-      style={{ width: "400px" }}
       checked={value}
       onChange={(e) => setValue(e.target.checked)}
     />

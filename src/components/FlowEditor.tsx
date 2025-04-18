@@ -25,6 +25,7 @@ import { Drawer } from "antd";
 import FlowNode, { type FlowNodeData } from "./FlowNode";
 import FlowEdge from "./FlowEdge";
 import FlowData from "./FlowData";
+import FlowCommands from "./FlowCommands";
 
 const nodeTypes = {
   flow: FlowNode,
@@ -60,31 +61,8 @@ function FlowEditor() {
   const onConnectEnd = useCallback(
     (_: MouseEvent | TouchEvent, state: FinalConnectionState) => {
       if (!state.isValid) {
-        const id = guidGenerator();
-        addNode(
-          id,
-          {
-            x: state?.to?.x ? state?.to?.x : 0,
-            y: state?.to?.y ? state?.to?.y : 0,
-          },
-          RestAPICommandSchema
-        );
-        setEdges((els) =>
-          addEdge(
-            {
-              ...state,
-              id: id,
-              source: state?.fromNode?.id ? state?.fromNode?.id : "",
-              sourceHandle: state?.fromHandle?.id ? state?.fromHandle?.id : "",
-              target: id,
-              type: "flow",
-              data: {
-                removeEdge: removeEdge,
-              },
-            },
-            els
-          )
-        );
+        setCreateConnection(state);
+        setCreateCommandDrawerOpen(true);
       }
     },
     []
@@ -121,7 +99,7 @@ function FlowEditor() {
       schema: schema,
       data: {},
     });
-    setOpen(true);
+    setEditCommandDrawerOpen(true);
   };
 
   const initialNodes: Node<FlowNodeData>[] = [
@@ -170,25 +148,71 @@ function FlowEditor() {
     },
   ];
 
+  const handleCreateSubmit = (schema: BaseCommandSchema) => {
+    const id = guidGenerator();
+    addNode(
+      id,
+      {
+        x: createConnection?.to?.x ? createConnection?.to?.x : 0,
+        y: createConnection?.to?.y ? createConnection?.to?.y : 0,
+      },
+      schema
+    );
+    setEdges((els) =>
+      addEdge(
+        {
+          ...createConnection,
+          id: id,
+          source: createConnection?.fromNode?.id
+            ? createConnection?.fromNode?.id
+            : "",
+          sourceHandle: createConnection?.fromHandle?.id
+            ? createConnection?.fromHandle?.id
+            : "",
+          target: id,
+          type: "flow",
+          data: {
+            removeEdge: removeEdge,
+          },
+        },
+        els
+      )
+    );
+    setCreateCommandDrawerOpen(false);
+    setCreateConnection(null);
+  };
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [open, setOpen] = useState(false);
+  const [createConnection, setCreateConnection] =
+    useState<FinalConnectionState | null>(null);
+  const [isCreateCommandDrawerOpen, setCreateCommandDrawerOpen] =
+    useState(false);
+  const [isEditCommandDrawerOpen, setEditCommandDrawerOpen] = useState(false);
   const [editData, setEditData] = useState<EditNodeData | null>(null);
-
-  const closeModal = () => {
-    setOpen(false);
-  };
 
   return (
     <ReactFlowProvider>
       <Drawer
-        title={"Edit Command"}
+        title={"Edit Node"}
         placement="right"
-        open={open}
-        onClose={closeModal}
         width={"40%"}
+        open={isEditCommandDrawerOpen}
+        onClose={() => setEditCommandDrawerOpen(false)}
       >
-        <FlowData editData={editData} closeModal={closeModal} />
+        <FlowData
+          editData={editData}
+          closeModal={() => setEditCommandDrawerOpen(false)}
+        />
+      </Drawer>
+      <Drawer
+        title={"Create Node"}
+        placement="right"
+        width={600}
+        open={isCreateCommandDrawerOpen}
+        onClose={() => setCreateCommandDrawerOpen(false)}
+      >
+        <FlowCommands createNode={handleCreateSubmit} />
       </Drawer>
       <ReactFlow
         nodes={nodes}
