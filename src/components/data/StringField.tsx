@@ -1,8 +1,6 @@
 import { Input } from "antd";
 
-const { TextArea } = Input;
-
-function TextField({
+function StringField({
   value,
   setValue,
 }: {
@@ -10,7 +8,8 @@ function TextField({
   setValue: (value: string) => void;
 }) {
   return (
-    <TextArea
+    <Input
+      type="text"
       value={value}
       onChange={(e) => {
         setValue(e.target.value);
@@ -19,4 +18,4 @@ function TextField({
   );
 }
 
-export default TextField;
+export default StringField;

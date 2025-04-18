@@ -59,7 +59,6 @@ function FlowEditor() {
 
   const onConnectEnd = useCallback(
     (_: MouseEvent | TouchEvent, state: FinalConnectionState) => {
-      console.log(state);
       if (!state.isValid) {
         const id = guidGenerator();
         addNode(

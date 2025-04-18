@@ -25,14 +25,16 @@ type Field =
   | {
       key: string;
       name: string;
-      type: "string" | "number" | "boolean" | "object";
+      itemType?: "string" | "number" | "boolean";
+      type: "string" | "number" | "boolean" | "object" | "array" | "text";
       condition?: Condition;
     }
   | Dropdown
   | {
       key: string;
       name: string;
-      type: "array";
+      type: "array" | "object";
+      itemType?: "string" | "number" | "boolean" | "object";
       items: Field;
       condition?: Condition;
     };
@@ -87,7 +89,8 @@ const RestAPICommandSchema: BaseCommandSchema = {
     queryParams: {
       key: "queryParams",
       name: "Query Parameters",
-      type: "array",
+      type: "object",
+      itemType: "string",
       items: {
         key: "queryParam",
         name: "Query Parameter",
@@ -97,7 +100,8 @@ const RestAPICommandSchema: BaseCommandSchema = {
     pathParams: {
       key: "pathParams",
       name: "Path Parameters",
-      type: "array",
+      type: "object",
+      itemType: "number",
       items: {
         key: "pathParam",
         name: "Path Parameter",
@@ -107,12 +111,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
     body: {
       key: "body",
       name: "Body",
-      type: "object",
-      condition: {
-        field: "type",
-        type: "regex",
-        regex: "POST|PUT|PATCH",
-      },
+      type: "text",
     },
   },
   edges: {
