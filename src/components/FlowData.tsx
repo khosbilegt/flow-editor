@@ -11,16 +11,21 @@ import TextField from "./data/TextField";
 
 function FlowData({
   editData,
+  setEditData,
   closeModal,
 }: {
   editData: EditNodeData | null;
+  setEditData: (data: EditNodeData | null) => void;
   closeModal: () => void;
 }) {
   const [localData, setLocalData] = useState<any>(editData?.data);
 
   const saveData = () => {
     if (editData) {
-      editData.data = localData;
+      setEditData({
+        ...editData,
+        data: localData,
+      });
     }
     closeModal();
   };

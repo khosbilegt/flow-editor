@@ -13,19 +13,20 @@ import {
 } from "@xyflow/react";
 
 import { Connection } from "@xyflow/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BaseCommandSchema,
   EditNodeData,
+  getSchemaByCommand,
   RestAPICommandSchema,
 } from "../schema/generic";
-import { CallTransferCommandSchema } from "../schema/call";
 import { guidGenerator } from "../util/utils";
 import { Drawer } from "antd";
 import FlowNode, { type FlowNodeData } from "./FlowNode";
 import FlowEdge from "./FlowEdge";
 import FlowData from "./FlowData";
 import FlowCommands from "./FlowCommands";
+import { initialCommands } from "./dummy";
 
 const nodeTypes = {
   flow: FlowNode,
@@ -36,6 +37,20 @@ const edgeTypes = {
 };
 
 function FlowEditor() {
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(
+    []
+  );
+  // TODO: This should update via API when production.
+  const [commands, setCommands] = useState(initialCommands);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const [createConnection, setCreateConnection] =
+    useState<FinalConnectionState | null>(null);
+  const [isCreateCommandDrawerOpen, setCreateCommandDrawerOpen] =
+    useState(false);
+  const [isEditCommandDrawerOpen, setEditCommandDrawerOpen] =
+    useState<boolean>();
+  const [editData, setEditData] = useState<EditNodeData | null>(null);
+
   const removeEdge = useCallback(
     (id: string) => setEdges((els) => els.filter((edge) => edge.id !== id)),
     []
@@ -97,56 +112,10 @@ function FlowEditor() {
     setEditData({
       id: id,
       schema: schema,
-      data: {},
+      data: commands.find((command) => command.id === id)?.fields,
     });
     setEditCommandDrawerOpen(true);
   };
-
-  const initialNodes: Node<FlowNodeData>[] = [
-    {
-      id: "1",
-      position: { x: 0, y: 0 },
-      data: {
-        schema: RestAPICommandSchema,
-        deleteNode,
-        openNodeModal,
-      },
-      type: "flow",
-    },
-    {
-      id: "2",
-      position: { x: 500, y: 0 },
-      data: {
-        schema: CallTransferCommandSchema,
-        deleteNode,
-        openNodeModal,
-      },
-      type: "flow",
-    },
-    {
-      id: "3",
-      position: { x: 0, y: 250 },
-      data: {
-        schema: RestAPICommandSchema,
-        deleteNode,
-        openNodeModal,
-      },
-      type: "flow",
-    },
-  ];
-
-  const initialEdges: Edge[] = [
-    {
-      id: "e1-2",
-      source: "3",
-      sourceHandle: "onSuccess",
-      target: "2",
-      type: "flow",
-      data: {
-        removeEdge: removeEdge,
-      },
-    },
-  ];
 
   const handleCreateSubmit = (schema: BaseCommandSchema) => {
     const id = guidGenerator();
@@ -182,14 +151,36 @@ function FlowEditor() {
     setCreateConnection(null);
   };
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [createConnection, setCreateConnection] =
-    useState<FinalConnectionState | null>(null);
-  const [isCreateCommandDrawerOpen, setCreateCommandDrawerOpen] =
-    useState(false);
-  const [isEditCommandDrawerOpen, setEditCommandDrawerOpen] = useState(false);
-  const [editData, setEditData] = useState<EditNodeData | null>(null);
+  useEffect(() => {
+    const tempNodes: Node<FlowNodeData>[] = [];
+    const tempEdges: Edge[] = [];
+    commands?.map((command) => {
+      const commandSchema = getSchemaByCommand(command.command);
+      tempNodes.push({
+        id: command.id,
+        position: command.position,
+        data: {
+          schema: commandSchema ? commandSchema : RestAPICommandSchema,
+          deleteNode,
+          openNodeModal,
+        },
+        type: "flow",
+      });
+      tempEdges.push({
+        id: command.id,
+        source: command.id,
+        target: command?.edges?.onSuccess?.target
+          ? command?.edges?.onSuccess?.target
+          : "",
+        type: "flow",
+        data: {
+          removeEdge: removeEdge,
+        },
+      });
+    });
+    setNodes(tempNodes);
+    setEdges(tempEdges);
+  }, [commands]);
 
   return (
     <ReactFlowProvider>
@@ -202,6 +193,20 @@ function FlowEditor() {
       >
         <FlowData
           editData={editData}
+          setEditData={(editData) => {
+            console.log(editData);
+            setCommands((prev) =>
+              prev.map((command) => {
+                if (command.id === editData?.id) {
+                  return {
+                    ...command,
+                    fields: editData?.data,
+                  };
+                }
+                return command;
+              })
+            );
+          }}
           closeModal={() => setEditCommandDrawerOpen(false)}
         />
       </Drawer>

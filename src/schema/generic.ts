@@ -142,6 +142,16 @@ const RestAPICommandSchema: BaseCommandSchema = {
   },
 };
 
+const getSchemaByCommand = (command: string): BaseCommandSchema | null => {
+  const commandList: BaseCommandSchema[] = [RestAPICommandSchema];
+  const schema = commandList.find((schema) => schema.command === command);
+  if (schema) {
+    return schema;
+  } else {
+    return null;
+  }
+};
+
 export type {
   BaseCommandSchema,
   Field,
@@ -150,4 +160,4 @@ export type {
   SchemaEdge,
   EditNodeData,
 };
-export { RestAPICommandSchema };
+export { getSchemaByCommand, RestAPICommandSchema };
