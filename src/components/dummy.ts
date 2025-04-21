@@ -1,7 +1,18 @@
-const initialCommands = [
+interface DummyCommand {
+  id: string;
+  command: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  fields: Record<string, any>;
+  edges?: Record<string, any>;
+}
+
+const initialCommands: DummyCommand[] = [
   {
     id: "1",
-    command: "RestAPI",
+    command: "RestAPICommand",
     position: {
       x: 0,
       y: 0,
@@ -27,7 +38,7 @@ const initialCommands = [
   },
   {
     id: "2",
-    command: "CallTransfer",
+    command: "CallTransferCommand",
     position: {
       x: 500,
       y: 500,
@@ -38,7 +49,7 @@ const initialCommands = [
   },
   {
     id: "3",
-    command: "PlayMedia",
+    command: "PlayMediaCommand",
     position: {
       x: 500,
       y: 0,

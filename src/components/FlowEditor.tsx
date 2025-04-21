@@ -119,34 +119,46 @@ function FlowEditor() {
 
   const handleCreateSubmit = (schema: BaseCommandSchema) => {
     const id = guidGenerator();
-    addNode(
-      id,
-      {
+    const tempCommands = [...commands];
+    tempCommands.push({
+      id: id,
+      command: schema.command,
+      position: {
         x: createConnection?.to?.x ? createConnection?.to?.x : 0,
         y: createConnection?.to?.y ? createConnection?.to?.y : 0,
       },
-      schema
+      fields: {},
+      edges: {},
+    });
+
+    const sourceNodeId = createConnection?.fromNode?.id;
+    const sourceHandleId = createConnection?.fromHandle?.id
+      ? createConnection?.fromHandle?.id
+      : "";
+    const sourceCommand = tempCommands.find(
+      (command) => command.id === sourceNodeId
     );
-    setEdges((els) =>
-      addEdge(
-        {
-          ...createConnection,
-          id: id,
-          source: createConnection?.fromNode?.id
-            ? createConnection?.fromNode?.id
-            : "",
-          sourceHandle: createConnection?.fromHandle?.id
-            ? createConnection?.fromHandle?.id
-            : "",
-          target: id,
-          type: "flow",
-          data: {
-            removeEdge: removeEdge,
+
+    if (sourceCommand) {
+      const updatedSourceCommand = {
+        ...sourceCommand,
+        edges: {
+          ...sourceCommand.edges,
+          [sourceHandleId]: {
+            id: sourceHandleId,
+            type: "flow",
+            target: id,
           },
         },
-        els
-      )
-    );
+      };
+
+      const updatedCommands = tempCommands.map((command) =>
+        command.id === sourceCommand.id ? updatedSourceCommand : command
+      );
+
+      setCommands(updatedCommands);
+    }
+
     setCreateCommandDrawerOpen(false);
     setCreateConnection(null);
   };
@@ -166,17 +178,21 @@ function FlowEditor() {
         },
         type: "flow",
       });
-      tempEdges.push({
-        id: command.id,
-        source: command.id,
-        target: command?.edges?.onSuccess?.target
-          ? command?.edges?.onSuccess?.target
-          : "",
-        type: "flow",
-        data: {
-          removeEdge: removeEdge,
-        },
-      });
+      if (command.edges) {
+        Object.keys(command.edges).map((key) => {
+          const edge = command.edges?.[key];
+          tempEdges.push({
+            id: `${command.id}-${key}`,
+            source: command.id,
+            sourceHandle: key,
+            target: edge.target,
+            type: "flow",
+            data: {
+              removeEdge: removeEdge,
+            },
+          });
+        });
+      }
     });
     setNodes(tempNodes);
     setEdges(tempEdges);
@@ -194,7 +210,6 @@ function FlowEditor() {
         <FlowData
           editData={editData}
           setEditData={(editData) => {
-            console.log(editData);
             setCommands((prev) =>
               prev.map((command) => {
                 if (command.id === editData?.id) {

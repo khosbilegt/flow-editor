@@ -1,3 +1,5 @@
+import { CallTransferCommandSchema, PlayMediaCommandSchema } from "./call";
+
 type Condition = {
   field: string;
   type: "equals" | "regex";
@@ -143,7 +145,11 @@ const RestAPICommandSchema: BaseCommandSchema = {
 };
 
 const getSchemaByCommand = (command: string): BaseCommandSchema | null => {
-  const commandList: BaseCommandSchema[] = [RestAPICommandSchema];
+  const commandList: BaseCommandSchema[] = [
+    RestAPICommandSchema,
+    CallTransferCommandSchema,
+    PlayMediaCommandSchema,
+  ];
   const schema = commandList.find((schema) => schema.command === command);
   if (schema) {
     return schema;
