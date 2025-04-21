@@ -83,24 +83,6 @@ function FlowEditor() {
     []
   );
 
-  const addNode = useCallback(
-    (
-      id: string,
-      position: { x: number; y: number },
-      schema: BaseCommandSchema
-    ) => {
-      setNodes((els) =>
-        els.concat({
-          id,
-          position,
-          data: { schema, deleteNode: deleteNode, openNodeModal },
-          type: "flow",
-        })
-      );
-    },
-    []
-  );
-
   const deleteNode = useCallback((id: string) => {
     setEdges((els) =>
       els.filter((edge) => edge.source !== id && edge.target !== id)
