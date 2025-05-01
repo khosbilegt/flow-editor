@@ -12,6 +12,8 @@ import FlowEditor from "../components/FlowEditor";
 import "@xyflow/react/dist/style.css";
 import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
+import { Flow } from "@/schema/api";
+import { useGetFlowByIdQuery } from "../api/architect";
 
 const { Search } = Input;
 
@@ -20,6 +22,8 @@ const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
 
 function EditorLayout() {
+  const [flowId, setFlowId] = useState<string | null>("3");
+  const [flow, setFlow] = useState<Flow | null>(null);
   const keyboardListenerInitialized = useRef(false);
 
   const [handlers, _] = useState([
@@ -39,12 +43,15 @@ function EditorLayout() {
   const [isSaving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const { data: fetchFlowData } = useGetFlowByIdQuery(flowId ?? "", {
+    skip: !flowId || flowId === "",
+  });
+
   const save = () => {
     setSaving(true);
     setTimeout(() => {
       setSaving(false);
     }, 2000);
-    console.log("Save triggered");
   };
 
   useEffect(() => {
@@ -65,6 +72,13 @@ function EditorLayout() {
     };
   }, []);
 
+  useEffect(() => {
+    if (fetchFlowData) {
+      console.log(fetchFlowData);
+      setFlow(fetchFlowData);
+    }
+  }, [fetchFlowData]);
+
   return (
     <Layout style={{ height: "100vh", width: "100vw" }}>
       <Header
@@ -79,7 +93,7 @@ function EditorLayout() {
       >
         <Flex align="center">
           <Title level={3} editable>
-            Flow Name
+            {flow?.flowName}
           </Title>
         </Flex>
         <Flex align="center" gap={10}>
