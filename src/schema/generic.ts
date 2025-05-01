@@ -1,4 +1,8 @@
-import { CallTransferCommandSchema, PlayMediaCommandSchema } from "./call";
+import {
+  CallTransferCommandSchema,
+  HangupCommandSchema,
+  PlayMediaCommandSchema,
+} from "./call";
 
 type Condition = {
   field: string;
@@ -55,6 +59,7 @@ type Field =
 
 interface BaseCommandSchema {
   command: string;
+  type: string;
   fields: Record<string, Field>;
   edges?: Record<string, SchemaEdge>;
 }
@@ -67,6 +72,7 @@ interface EditNodeData {
 
 const RestAPICommandSchema: BaseCommandSchema = {
   command: "RestAPICommand",
+  type: "REST_API",
   fields: {
     dataObjectId: {
       key: "dataObjectId",
@@ -144,13 +150,14 @@ const RestAPICommandSchema: BaseCommandSchema = {
   },
 };
 
-const getSchemaByCommand = (command: string): BaseCommandSchema | null => {
+const getSchemaByCommand = (type: string): BaseCommandSchema | null => {
   const commandList: BaseCommandSchema[] = [
     RestAPICommandSchema,
     CallTransferCommandSchema,
     PlayMediaCommandSchema,
+    HangupCommandSchema,
   ];
-  const schema = commandList.find((schema) => schema.command === command);
+  const schema = commandList.find((schema) => schema.type === type);
   if (schema) {
     return schema;
   } else {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   CallTransferCommandSchema,
+  HangupCommandSchema,
   PlayMediaCommandSchema,
 } from "../schema/call";
 import { BaseCommandSchema, RestAPICommandSchema } from "../schema/generic";
@@ -13,6 +14,7 @@ const commandList: BaseCommandSchema[] = [
   RestAPICommandSchema,
   CallTransferCommandSchema,
   PlayMediaCommandSchema,
+  HangupCommandSchema,
 ];
 
 function FlowCommands({

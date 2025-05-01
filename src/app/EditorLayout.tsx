@@ -12,8 +12,12 @@ import FlowEditor from "../components/FlowEditor";
 import "@xyflow/react/dist/style.css";
 import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
-import { Flow } from "@/schema/api";
-import { useGetFlowByIdQuery } from "../api/architect";
+import {
+  useGetFlowByIdQuery,
+  useGetFlowHandlerByIdQuery,
+  useListFlowHandlersQuery,
+  useListFlowVersionQuery,
+} from "../api/architect";
 
 const { Search } = Input;
 
@@ -22,30 +26,35 @@ const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
 
 function EditorLayout() {
-  const [flowId, setFlowId] = useState<string | null>("3");
-  const [flow, setFlow] = useState<Flow | null>(null);
+  // -1 must not fetch.
+  const [flowId, setFlowId] = useState<number>(-1);
+  const [handlerId, setHandlerId] = useState<string>("MAIN");
+  const [selectedVersion, setSelectedVersion] = useState<string>("");
   const keyboardListenerInitialized = useRef(false);
-
-  const [handlers, _] = useState([
-    {
-      id: 1,
-      name: "Handler 1",
-    },
-    {
-      id: 2,
-      name: "Handler 2",
-    },
-    {
-      id: 3,
-      name: "Handler 3",
-    },
-  ]);
   const [isSaving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: fetchFlowData } = useGetFlowByIdQuery(flowId ?? "", {
-    skip: !flowId || flowId === "",
+  const { data: flow } = useGetFlowByIdQuery(flowId, {
+    skip: flowId === -1,
   });
+
+  const { data: handlers } = useListFlowHandlersQuery(
+    { flowId, version: selectedVersion },
+    {
+      skip: flowId === -1 || selectedVersion === "",
+    }
+  );
+
+  const { data: versions } = useListFlowVersionQuery(flowId, {
+    skip: flowId === -1,
+  });
+
+  const { data: selectedHandler } = useGetFlowHandlerByIdQuery(
+    { flowId, handlerId, version: selectedVersion },
+    {
+      skip: flowId === -1 || selectedVersion === "",
+    }
+  );
 
   const save = () => {
     setSaving(true);
@@ -55,6 +64,22 @@ function EditorLayout() {
   };
 
   useEffect(() => {
+    if (flow?.deployedVersion && selectedVersion === "") {
+      window.location.replace(
+        `/${flowId}/${flow.deployedVersion}/${handlerId}`
+      );
+    }
+  }, [flow]);
+
+  useEffect(() => {
+    const pathParts = window.location.pathname.split("/");
+    const flowId = decodeURI(pathParts[1]);
+    const version = decodeURI(pathParts[2]);
+    const handlerId = decodeURI(pathParts[3]);
+    setFlowId(Number(flowId));
+    setHandlerId(handlerId);
+    setSelectedVersion(version);
+
     if (keyboardListenerInitialized.current) return;
     keyboardListenerInitialized.current = true;
 
@@ -71,13 +96,6 @@ function EditorLayout() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  useEffect(() => {
-    if (fetchFlowData) {
-      console.log(fetchFlowData);
-      setFlow(fetchFlowData);
-    }
-  }, [fetchFlowData]);
 
   return (
     <Layout style={{ height: "100vh", width: "100vw" }}>
@@ -107,7 +125,14 @@ function EditorLayout() {
               <Select
                 placeholder="Version"
                 style={{ width: "100%" }}
-                value={"main"}
+                value={selectedVersion}
+                options={versions?.map((version) => ({
+                  label: version.definitionVersion,
+                  value: version.definitionVersion,
+                }))}
+                onChange={(e) => {
+                  window.location.href = `/${flowId}/${e}/${handlerId}`;
+                }}
               />
               <Button type="primary" icon={<PlusOutlined />} />
             </Flex>
@@ -117,19 +142,42 @@ function EditorLayout() {
               allowClear
               enterButton
             />
-            {handlers.map((handler, index) => {
-              if (
-                searchTerm &&
-                !handler.name.toLowerCase().includes(searchTerm.toLowerCase())
-              ) {
-                return null;
-              }
-              return (
-                <Button key={index} style={{ width: "100%" }}>
-                  {handler.name}
-                </Button>
-              );
-            })}
+            {handlers
+              ?.slice() // Create a shallow copy of the array to avoid mutating the original
+              .sort((a, b) => {
+                // Ensure "Main Handler" is always first
+                if (a.handlerId === "MAIN") return -1;
+                if (b.handlerId === "MAIN") return 1;
+
+                // Otherwise, sort alphabetically by handlerName
+                return a.handlerName.localeCompare(b.handlerName);
+              })
+              .map((handler, index) => {
+                if (
+                  searchTerm &&
+                  !handler.handlerName
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+                ) {
+                  return null;
+                }
+                return (
+                  <Button
+                    key={index}
+                    style={{ width: "100%" }}
+                    onClick={() =>
+                      (window.location.href = `/${flowId}/${selectedVersion}/${handler.handlerId}`)
+                    }
+                    type={
+                      handler.handlerId === handlerId ? "primary" : "default"
+                    }
+                  >
+                    {handler.handlerId === "MAIN"
+                      ? "Main Handler"
+                      : handler.handlerName}
+                  </Button>
+                );
+              })}
           </Flex>
         </Sider>
         <Content
@@ -139,7 +187,7 @@ function EditorLayout() {
             borderRadius: "12px",
           }}
         >
-          <FlowEditor />
+          <FlowEditor handler={selectedHandler} />
           <FloatButton
             onClick={() => save()}
             style={{ width: "50px", height: "50px" }}

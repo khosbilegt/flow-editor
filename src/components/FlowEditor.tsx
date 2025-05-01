@@ -22,11 +22,11 @@ import {
 } from "../schema/generic";
 import { guidGenerator } from "../util/utils";
 import { Drawer } from "antd";
+import { FlowCommand, FlowHandler } from "@/schema/architect";
 import FlowNode, { type FlowNodeData } from "./FlowNode";
 import FlowEdge from "./FlowEdge";
 import FlowData from "./FlowData";
 import FlowCommands from "./FlowCommands";
-import { initialCommands } from "./dummy";
 
 const nodeTypes = {
   flow: FlowNode,
@@ -36,12 +36,12 @@ const edgeTypes = {
   flow: FlowEdge,
 };
 
-function FlowEditor() {
+function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(
     []
   );
   // TODO: This should update via API when production.
-  const [commands, setCommands] = useState(initialCommands);
+  const [commands, setCommands] = useState<FlowCommand[]>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [createConnection, setCreateConnection] =
     useState<FinalConnectionState | null>(null);
@@ -104,13 +104,13 @@ function FlowEditor() {
     const tempCommands = [...commands];
     tempCommands.push({
       id: id,
-      command: schema.command,
-      position: {
-        x: createConnection?.to?.x ? createConnection?.to?.x : 0,
-        y: createConnection?.to?.y ? createConnection?.to?.y : 0,
-      },
+      name: "Default Name",
+      type: schema.type,
+      positionX: createConnection?.to?.x ? createConnection?.to?.x : 0,
+      positionY: createConnection?.to?.y ? createConnection?.to?.y : 0,
       fields: {},
       edges: {},
+      errors: [],
     });
 
     const sourceNodeId = createConnection?.fromNode?.id;
@@ -149,12 +149,16 @@ function FlowEditor() {
     const tempNodes: Node<FlowNodeData>[] = [];
     const tempEdges: Edge[] = [];
     commands?.map((command) => {
-      const commandSchema = getSchemaByCommand(command.command);
+      const commandSchema = getSchemaByCommand(command.type);
       tempNodes.push({
         id: command.id,
-        position: command.position,
+        position: {
+          x: command.positionX ? command.positionX : 0,
+          y: command.positionY ? command.positionY : 0,
+        },
         data: {
           schema: commandSchema ? commandSchema : RestAPICommandSchema,
+          name: command.name,
           deleteNode,
           openNodeModal,
         },
@@ -179,6 +183,18 @@ function FlowEditor() {
     setNodes(tempNodes);
     setEdges(tempEdges);
   }, [commands]);
+
+  useEffect(() => {
+    if (handler) {
+      const tempCommands: FlowCommand[] = [];
+      Object.keys(handler.commands).map((key) => {
+        const command: FlowCommand = handler.commands[key];
+        tempCommands.push(command);
+        console.log(command);
+      });
+      setCommands(tempCommands);
+    }
+  }, [handler]);
 
   return (
     <ReactFlowProvider>

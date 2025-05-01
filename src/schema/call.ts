@@ -2,6 +2,7 @@ import { BaseCommandSchema } from "./generic";
 
 const CallTransferCommandSchema: BaseCommandSchema = {
   command: "TransferCommand",
+  type: "CALL_TRANSFER",
   fields: {
     transferType: {
       key: "transferType",
@@ -73,6 +74,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
 
 const PlayMediaCommandSchema: BaseCommandSchema = {
   command: "PlayMediaCommand",
+  type: "PLAY_MEDIA",
   fields: {
     isInterruptible: {
       key: "isInterruptible",
@@ -121,4 +123,20 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
   },
 };
 
-export { CallTransferCommandSchema, PlayMediaCommandSchema };
+const HangupCommandSchema: BaseCommandSchema = {
+  command: "HangupCommand",
+  type: "HANGUP",
+  fields: {
+    reason: {
+      key: "reason",
+      name: "Reason",
+      type: "string",
+    },
+  },
+};
+
+export {
+  CallTransferCommandSchema,
+  PlayMediaCommandSchema,
+  HangupCommandSchema,
+};

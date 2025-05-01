@@ -9,6 +9,7 @@ const { Text } = Typography;
 
 export type FlowNodeData = {
   schema: BaseCommandSchema;
+  name: string;
   deleteNode: (id: string) => void;
   openNodeModal: (schema: BaseCommandSchema, id: string) => void;
 };
@@ -16,7 +17,7 @@ export type FlowNodeData = {
 export default memo(
   ({
     id,
-    data: { schema, deleteNode, openNodeModal },
+    data: { name, schema, deleteNode, openNodeModal },
   }: NodeProps<Node<FlowNodeData>>) => {
     return (
       <Card
@@ -42,7 +43,7 @@ export default memo(
         ]}
       >
         <Meta
-          title={"Random Name"}
+          title={name ? name : "No Name"}
           description={
             <Flex vertical style={{ width: "100%" }}>
               <Text type="secondary">{schema.command}</Text>
