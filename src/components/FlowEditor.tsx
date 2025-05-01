@@ -1,6 +1,7 @@
 import {
   addEdge,
   Background,
+  ControlButton,
   Controls,
   Edge,
   FinalConnectionState,
@@ -27,6 +28,7 @@ import FlowNode, { type FlowNodeData } from "./FlowNode";
 import FlowEdge from "./FlowEdge";
 import FlowData from "./FlowData";
 import FlowCommands from "./FlowCommands";
+import { FileAddOutlined } from "@ant-design/icons";
 
 const nodeTypes = {
   flow: FlowNode,
@@ -50,28 +52,31 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
   const [isEditCommandDrawerOpen, setEditCommandDrawerOpen] =
     useState<boolean>();
   const [editData, setEditData] = useState<EditNodeData | null>(null);
+  const [edgeConnectParams, setEdgeConnectParams] = useState<
+    Connection | undefined
+  >();
 
   const removeEdge = useCallback(
     (id: string) => setEdges((els) => els.filter((edge) => edge.id !== id)),
     []
   );
 
-  const onConnect = useCallback(
-    (params: Connection) =>
-      setEdges((els) =>
-        addEdge(
-          {
-            ...params,
-            type: "flow",
-            data: {
-              removeEdge: removeEdge,
-            },
+  const onConnect = useCallback((params: Connection) => {
+    setEdges((els) => {
+      const updatedEdges = addEdge(
+        {
+          ...params,
+          type: "flow",
+          data: {
+            removeEdge: removeEdge,
           },
-          els
-        )
-      ),
-    []
-  );
+        },
+        els
+      );
+      return updatedEdges;
+    });
+    setEdgeConnectParams(params);
+  }, []);
 
   const onConnectEnd = useCallback(
     (_: MouseEvent | TouchEvent, state: FinalConnectionState) => {
@@ -101,7 +106,7 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
 
   const handleCreateSubmit = (schema: BaseCommandSchema) => {
     const id = guidGenerator();
-    const tempCommands = [...commands];
+    const tempCommands = updateCommandPositions(commands);
     tempCommands.push({
       id: id,
       name: "Default Name",
@@ -139,10 +144,27 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
       );
 
       setCommands(updatedCommands);
+    } else {
+      setCommands(tempCommands);
     }
 
     setCreateCommandDrawerOpen(false);
     setCreateConnection(null);
+  };
+
+  const updateCommandPositions = (updateCommands: FlowCommand[]) => {
+    const tempCommands: FlowCommand[] = [];
+    nodes.map((node) => {
+      const command = updateCommands.find((command) => command.id === node.id);
+      if (command) {
+        tempCommands.push({
+          ...command,
+          positionX: node.position.x,
+          positionY: node.position.y,
+        });
+      }
+    });
+    return tempCommands;
   };
 
   useEffect(() => {
@@ -185,12 +207,40 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
   }, [commands]);
 
   useEffect(() => {
+    if (edgeConnectParams) {
+      const tempCommands = updateCommandPositions(commands);
+      const sourceNodeId = edgeConnectParams?.source;
+      const sourceHandleId = edgeConnectParams?.sourceHandle;
+      const targetNodeId = edgeConnectParams?.target;
+      const updatedCommands: FlowCommand[] = [];
+      tempCommands?.forEach((command) => {
+        if (command.id === sourceNodeId && sourceHandleId) {
+          const updatedSourceCommand = {
+            ...command,
+            edges: {
+              ...command.edges,
+              [sourceHandleId]: {
+                id: sourceHandleId,
+                type: "flow",
+                target: targetNodeId,
+              },
+            },
+          };
+          updatedCommands.push(updatedSourceCommand);
+        } else {
+          updatedCommands.push(command);
+        }
+      });
+      setCommands(updatedCommands);
+    }
+  }, [edgeConnectParams]);
+
+  useEffect(() => {
     if (handler) {
       const tempCommands: FlowCommand[] = [];
       Object.keys(handler.commands).map((key) => {
         const command: FlowCommand = handler.commands[key];
         tempCommands.push(command);
-        console.log(command);
       });
       setCommands(tempCommands);
     }
@@ -245,7 +295,11 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
       >
         <Background />
         <MiniMap position={"bottom-center"} />
-        <Controls />
+        <Controls>
+          <ControlButton onClick={() => setCreateCommandDrawerOpen(true)}>
+            <FileAddOutlined />
+          </ControlButton>
+        </Controls>
       </ReactFlow>
     </ReactFlowProvider>
   );
