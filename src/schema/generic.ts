@@ -90,8 +90,8 @@ const RestAPICommandSchema: BaseCommandSchema = {
   type: "API_CALL",
   fields: {
     dataObjectId: {
-      key: "dataObjectId",
-      name: "Data Object ID",
+      key: "restClientId",
+      name: "Rest Client ID",
       type: "dropdown",
       valueType: "api",
       apiPath: "https://contactx.unitel.mn/api/data-objects",

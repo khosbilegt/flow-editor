@@ -67,10 +67,12 @@ function EditorLayout() {
   const save = () => {
     if (selectedHandlerRef.current) {
       const commandMap: Record<string, FlowCommand> = {};
+      console.log("Saving", commandRef.current);
       commandRef.current.forEach((command: FlowCommand) => {
         let formattedCommand: any = { ...command };
         Object.keys(formattedCommand.fields).forEach((key: string) => {
           const fieldValue = command.fields[key];
+          console.log(fieldValue);
           formattedCommand[key] = command.fields[key];
           if (typeof fieldValue === "object" && fieldValue !== null) {
             if (Array.isArray(fieldValue)) {
@@ -159,6 +161,7 @@ function EditorLayout() {
   }, [selectedHandler]);
 
   useEffect(() => {
+    console.log(commands);
     commandRef.current = commands;
   }, [commands]);
 

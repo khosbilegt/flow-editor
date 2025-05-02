@@ -70,15 +70,20 @@ export const architectAPI = createApi({
                 };
               } else {
                 if (command[fieldKey] && Array.isArray(command[fieldKey])) {
-                  let tempField: any = {};
-                  command[fieldKey].forEach((item: any, index: number) => {
+                  let tempFieldMap: any = {};
+                  let tempFieldArray: any[] = [];
+                  command[fieldKey].forEach((item: any) => {
                     if (item.key && item.expression) {
-                      tempField[item.key] = item.expression;
+                      tempFieldMap[item.key] = item.expression;
                     } else {
-                      tempField[index] = item;
+                      tempFieldArray.push(item);
                     }
                   });
-                  fields[fieldKey] = tempField;
+                  if (tempFieldArray.length > 0) {
+                    fields[fieldKey] = tempFieldArray;
+                  } else {
+                    fields[fieldKey] = tempFieldMap;
+                  }
                 } else {
                   fields[fieldKey] = command[fieldKey];
                 }

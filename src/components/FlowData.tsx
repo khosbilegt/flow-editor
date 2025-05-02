@@ -1,5 +1,5 @@
 import { EditNodeData } from "@/schema/generic";
-import { Button, Flex, Form, Input, Typography } from "antd";
+import { Alert, Button, Flex, Form, Input, Typography } from "antd";
 import { useEffect, useState } from "react";
 import BooleanField from "./data/BooleanField";
 import NumberField from "./data/NumberField";
@@ -144,7 +144,10 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
-                  dropdownValues={field?.values ? field.values : {}}
+                  dropdownValues={{
+                    test: "test",
+                  }}
+                  // dropdownValues={field?.values ? field.values : {}}
                   error={localErrors[field.key]}
                 />
               )}
@@ -202,9 +205,20 @@ function FlowData({
           <Button type="primary" htmlType="submit" onClick={() => saveData()}>
             Save
           </Button>
-          <Button htmlType="submit">Cancel</Button>
         </Flex>
       </Form.Item>
+      {editData?.errors?.map((error, index) => {
+        if (error?.field?.startsWith("on")) {
+          return (
+            <Alert
+              key={index}
+              message={error.field}
+              description={error.errorMessage}
+              type="error"
+            />
+          );
+        }
+      })}
     </Form>
   );
 }
