@@ -6,9 +6,19 @@ export const architectAPI = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:8080/public",
   }),
+  tagTypes: ["Flow", "FlowHandler"],
   endpoints: (build) => ({
     getFlowById: build.query<Flow, number>({
       query: (flowId) => `/flow/${flowId}`,
+      providesTags: (_) => {
+        return ["Flow"];
+      },
+    }),
+    listFlowVersion: build.query<Flow[], number>({
+      query: (flowId) => `/flow/${flowId}/version`,
+      providesTags: (_) => {
+        return ["Flow"];
+      },
     }),
     listFlowHandlers: build.query<
       FlowHandler[],
@@ -16,6 +26,9 @@ export const architectAPI = createApi({
     >({
       query: (data: { flowId: number; version: string }) =>
         `/flow/${data.flowId}/handler/list?version=${data.version}`,
+      providesTags: (_) => {
+        return ["Flow", "FlowHandler"];
+      },
     }),
     getFlowHandlerById: build.query<
       FlowHandler,
@@ -27,6 +40,9 @@ export const architectAPI = createApi({
     >({
       query: (data: { flowId: number; handlerId: string; version: string }) =>
         `/flow/${data.flowId}/handler?handlerId=${data.handlerId}&version=${data.version}`,
+      providesTags: (_) => {
+        return ["Flow", "FlowHandler"];
+      },
       transformResponse: (response: any) => {
         const tempCommands: FlowCommand[] = [];
         Object.keys(response?.commands).forEach((key) => {
@@ -59,8 +75,21 @@ export const architectAPI = createApi({
         return transformedResponse;
       },
     }),
-    listFlowVersion: build.query<Flow[], number>({
-      query: (flowId) => `/flow/${flowId}/version`,
+    updateFlowHandler: build.mutation<
+      FlowHandler,
+      {
+        flowId: number;
+        data: FlowHandler;
+      }
+    >({
+      query: (data: { flowId: number; data: FlowHandler }) => ({
+        url: `/flow/${data.flowId}/handler`,
+        method: "PUT",
+        body: data.data,
+      }),
+      invalidatesTags: (_) => {
+        return ["FlowHandler"];
+      },
     }),
   }),
 });
@@ -70,4 +99,5 @@ export const {
   useGetFlowHandlerByIdQuery,
   useListFlowHandlersQuery,
   useListFlowVersionQuery,
+  useUpdateFlowHandlerMutation,
 } = architectAPI;

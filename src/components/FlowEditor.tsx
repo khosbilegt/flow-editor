@@ -38,12 +38,17 @@ const edgeTypes = {
   flow: FlowEdge,
 };
 
-function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
+function FlowEditor({
+  commands,
+  setCommands,
+}: {
+  handler: FlowHandler | undefined;
+  commands: FlowCommand[];
+  setCommands: React.Dispatch<React.SetStateAction<FlowCommand[]>>;
+}) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(
     []
   );
-  // TODO: This should update via API when production.
-  const [commands, setCommands] = useState<FlowCommand[]>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [createConnection, setCreateConnection] =
     useState<FinalConnectionState | null>(null);
@@ -235,17 +240,6 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
     }
   }, [edgeConnectParams]);
 
-  useEffect(() => {
-    if (handler) {
-      const tempCommands: FlowCommand[] = [];
-      Object.keys(handler.commands).map((key) => {
-        const command: FlowCommand = handler.commands[key];
-        tempCommands.push(command);
-      });
-      setCommands(tempCommands);
-    }
-  }, [handler]);
-
   return (
     <ReactFlowProvider>
       <Drawer
@@ -259,7 +253,7 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
           editData={editData}
           setEditData={(editData) => {
             setCommands((prev) =>
-              prev.map((command) => {
+              prev.map((command: FlowCommand) => {
                 if (command.id === editData?.id) {
                   return {
                     ...command,
@@ -291,6 +285,10 @@ function FlowEditor({ handler }: { handler: FlowHandler | undefined }) {
         onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        onNodeDragStop={(e) => {
+          console.log("Drag over", e);
+          setCommands(updateCommandPositions(commands));
+        }}
         attributionPosition="bottom-right"
       >
         <Background />

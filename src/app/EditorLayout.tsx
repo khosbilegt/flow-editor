@@ -17,7 +17,9 @@ import {
   useGetFlowHandlerByIdQuery,
   useListFlowHandlersQuery,
   useListFlowVersionQuery,
+  useUpdateFlowHandlerMutation,
 } from "../api/architect";
+import { FlowCommand, FlowHandler } from "@/schema/architect";
 
 const { Search } = Input;
 
@@ -27,11 +29,14 @@ const { Title } = Typography;
 
 function EditorLayout() {
   // -1 must not fetch.
+  const flowIdRef = useRef<number>(-1);
+  const commandRef = useRef<FlowCommand[]>([]);
+  const selectedHandlerRef = useRef<FlowHandler | undefined>(undefined);
   const [flowId, setFlowId] = useState<number>(-1);
   const [handlerId, setHandlerId] = useState<string>("MAIN");
   const [selectedVersion, setSelectedVersion] = useState<string>("");
+  const [commands, setCommands] = useState<FlowCommand[]>([]);
   const keyboardListenerInitialized = useRef(false);
-  const [isSaving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: flow } = useGetFlowByIdQuery(flowId, {
@@ -45,6 +50,9 @@ function EditorLayout() {
     }
   );
 
+  const [updateFlowHandler, { isLoading: isSaving }] =
+    useUpdateFlowHandlerMutation();
+
   const { data: versions } = useListFlowVersionQuery(flowId, {
     skip: flowId === -1,
   });
@@ -57,10 +65,30 @@ function EditorLayout() {
   );
 
   const save = () => {
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-    }, 2000);
+    if (selectedHandlerRef.current) {
+      const commandMap: Record<string, FlowCommand> = {};
+      commandRef.current.forEach((command: FlowCommand) => {
+        let formattedCommand: any = { ...command };
+        Object.keys(formattedCommand.fields).forEach((key: string) => {
+          formattedCommand[key] = command.fields[key];
+        });
+        commandMap[command.id] = formattedCommand;
+      });
+      let updatedDefinition: FlowHandler = {
+        ...selectedHandlerRef.current,
+        commands: commandMap,
+      };
+      console.log(updatedDefinition.commands);
+      console.log(flowIdRef.current);
+      updateFlowHandler({
+        flowId: flowIdRef.current,
+        data: updatedDefinition,
+      })
+        .unwrap()
+        .then((res) => {
+          console.log("Update successful", res);
+        });
+    }
   };
 
   useEffect(() => {
@@ -76,6 +104,7 @@ function EditorLayout() {
     const flowId = decodeURI(pathParts[1]);
     const version = decodeURI(pathParts[2]);
     const handlerId = decodeURI(pathParts[3]);
+    flowIdRef.current = Number(flowId);
     setFlowId(Number(flowId));
     setHandlerId(handlerId);
     setSelectedVersion(version);
@@ -96,6 +125,28 @@ function EditorLayout() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    if (selectedHandler) {
+      const tempCommands: FlowCommand[] = [];
+      Object.keys(selectedHandler.commands).map((key) => {
+        const command: FlowCommand = selectedHandler.commands[key];
+        tempCommands.push(command);
+      });
+      setCommands(tempCommands);
+    }
+  }, [selectedHandler]);
+
+  useEffect(() => {
+    commandRef.current = commands;
+    console.log(commandRef.current);
+  }, [commands]);
+
+  useEffect(() => {
+    if (selectedHandler) {
+      selectedHandlerRef.current = selectedHandler;
+    }
+  }, [selectedHandler]);
 
   return (
     <Layout style={{ height: "100vh", width: "100vw" }}>
@@ -187,7 +238,11 @@ function EditorLayout() {
             borderRadius: "12px",
           }}
         >
-          <FlowEditor handler={selectedHandler} />
+          <FlowEditor
+            handler={selectedHandler}
+            commands={commands}
+            setCommands={setCommands}
+          />
           <FloatButton
             onClick={() => save()}
             style={{ width: "50px", height: "50px" }}
