@@ -1,3 +1,4 @@
+import { FlowValidationError } from "./architect";
 import {
   CallTransferCommandSchema,
   HangupCommandSchema,
@@ -81,6 +82,7 @@ interface EditNodeData {
   setName: (name: string) => void;
   schema: BaseCommandSchema;
   data: any;
+  errors: FlowValidationError[];
 }
 
 const RestAPICommandSchema: BaseCommandSchema = {

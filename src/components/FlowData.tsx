@@ -1,5 +1,5 @@
 import { EditNodeData } from "@/schema/generic";
-import { Button, Flex, Form, Input } from "antd";
+import { Button, Flex, Form, Input, Typography } from "antd";
 import { useEffect, useState } from "react";
 import BooleanField from "./data/BooleanField";
 import NumberField from "./data/NumberField";
@@ -9,6 +9,9 @@ import ArrayField from "./data/ArrayField";
 import TextField from "./data/TextField";
 import MapField from "./data/MapField";
 import ObjectField from "./data/ObjectField";
+import { FlowValidationError } from "@/schema/architect";
+
+const { Text } = Typography;
 
 function FlowData({
   editData,
@@ -21,6 +24,9 @@ function FlowData({
 }) {
   const [localName, setLocalName] = useState<string>(editData?.name || "");
   const [localData, setLocalData] = useState<any>(editData?.data);
+  const [localErrors, setLocalErrors] = useState<
+    Record<string, FlowValidationError>
+  >({});
 
   const saveData = () => {
     if (editData) {
@@ -37,6 +43,13 @@ function FlowData({
   useEffect(() => {
     setLocalName(editData?.name || "");
     setLocalData(editData?.data);
+    let tempErrors: Record<string, FlowValidationError> = {};
+    if (editData?.errors) {
+      editData.errors.forEach((error) => {
+        tempErrors[error.field] = error;
+      });
+    }
+    setLocalErrors(tempErrors);
   }, [editData]);
 
   return (
@@ -83,6 +96,7 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "text" && (
@@ -94,6 +108,7 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "number" && (
@@ -105,6 +120,7 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "boolean" && (
@@ -116,6 +132,7 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "dropdown" && (
@@ -128,6 +145,7 @@ function FlowData({
                     });
                   }}
                   dropdownValues={field?.values ? field.values : {}}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "map" && (
@@ -140,6 +158,7 @@ function FlowData({
                       [field.key]: object,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "array" && (
@@ -159,10 +178,21 @@ function FlowData({
                       [field.key]: items,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "object" && (
-                <ObjectField object={{}} setObject={() => {}} fields={[]} />
+                <ObjectField
+                  object={{}}
+                  setObject={() => {}}
+                  fields={[]}
+                  error={localErrors[field.key]}
+                />
+              )}
+              {localErrors[field.key] && (
+                <Text style={{ color: "red" }}>
+                  {localErrors[field.key].errorMessage}
+                </Text>
               )}
             </Form.Item>
           );

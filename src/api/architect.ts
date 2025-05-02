@@ -79,7 +79,6 @@ export const architectAPI = createApi({
                     }
                   });
                   fields[fieldKey] = tempField;
-                  console.log(tempField);
                 } else {
                   fields[fieldKey] = command[fieldKey];
                 }

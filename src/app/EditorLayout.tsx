@@ -160,7 +160,6 @@ function EditorLayout() {
 
   useEffect(() => {
     commandRef.current = commands;
-    console.log(commands);
   }, [commands]);
 
   useEffect(() => {

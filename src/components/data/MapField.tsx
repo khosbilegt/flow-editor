@@ -3,15 +3,18 @@ import { Button, Flex, Input } from "antd";
 import StringField from "./StringField";
 import NumberField from "./NumberField";
 import BooleanField from "./BooleanField";
+import { FlowValidationError } from "@/schema/architect";
 
 function MapField({
   itemType,
   object,
   setObject,
+  error,
 }: {
   itemType: string;
   object: any;
   setObject: (object: any) => void;
+  error?: FlowValidationError | null | undefined;
 }) {
   return (
     <Flex vertical gap={5}>
@@ -29,6 +32,7 @@ function MapField({
                       [key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             }
@@ -43,6 +47,7 @@ function MapField({
                       [key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             }
@@ -57,6 +62,7 @@ function MapField({
                       [key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             }
@@ -72,6 +78,7 @@ function MapField({
                       [key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             }
@@ -108,7 +115,7 @@ function MapField({
           return <></>;
         };
         return (
-          <Flex gap={5}>
+          <Flex gap={5} key={index}>
             <Input
               placeholder="Key"
               value={key}

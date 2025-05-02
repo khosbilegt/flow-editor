@@ -26,9 +26,14 @@ interface FlowCommand {
   type: string;
   positionX: number;
   positionY: number;
-  errors: any[];
+  errors: FlowValidationError[];
   fields: Record<string, any>;
   edges?: Record<string, any>;
 }
 
-export type { Flow, FlowHandler, FlowCommand };
+interface FlowValidationError {
+  field: string;
+  errorMessage: string;
+}
+
+export type { Flow, FlowHandler, FlowCommand, FlowValidationError };

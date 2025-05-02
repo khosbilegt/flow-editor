@@ -106,12 +106,14 @@ function FlowEditor({
     name: string,
     setName: (name: string) => void
   ) => {
+    const tempCommand = commands.find((command) => command.id === id);
     setEditData({
       id: id,
       schema: schema,
       name: name,
       setName: setName,
-      data: commands.find((command) => command.id === id)?.fields,
+      data: tempCommand?.fields,
+      errors: tempCommand?.errors ? tempCommand?.errors : [],
     });
     setEditCommandDrawerOpen(true);
   };
@@ -208,6 +210,7 @@ function FlowEditor({
           },
           deleteNode,
           openNodeModal,
+          errors: command.errors,
         },
         type: "flow",
       });

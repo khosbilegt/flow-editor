@@ -6,15 +6,18 @@ import BooleanField from "./BooleanField";
 import MapField from "./MapField";
 import ArrayField from "./ArrayField";
 import DropdownField from "./DropdownField";
+import { FlowValidationError } from "@/schema/architect";
 
 function ObjectField({
   object,
   setObject,
   fields,
+  error,
 }: {
   object: Record<string, any>;
   setObject: (object: Record<string, any>) => void;
   fields: Field[];
+  error?: FlowValidationError | null | undefined;
 }) {
   return (
     <Flex vertical gap={5}>
@@ -32,6 +35,7 @@ function ObjectField({
                       [field.key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             case "number":
@@ -45,6 +49,7 @@ function ObjectField({
                       [field.key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             case "boolean":
@@ -58,6 +63,7 @@ function ObjectField({
                       [field.key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             case "map":
@@ -72,6 +78,7 @@ function ObjectField({
                       [field.key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             case "array":
@@ -87,6 +94,7 @@ function ObjectField({
                   }}
                   itemType={field?.itemType ? field?.itemType : ""}
                   itemFields={field?.fields ? field?.fields : []}
+                  error={error}
                 />
               );
             case "dropdown":
@@ -102,6 +110,7 @@ function ObjectField({
                       [field.key]: value,
                     });
                   }}
+                  error={error}
                 />
               );
             default:
