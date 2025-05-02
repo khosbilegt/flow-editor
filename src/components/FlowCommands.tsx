@@ -1,21 +1,9 @@
 import { useState } from "react";
-import {
-  CallTransferCommandSchema,
-  HangupCommandSchema,
-  PlayMediaCommandSchema,
-} from "../schema/call";
-import { BaseCommandSchema, RestAPICommandSchema } from "../schema/generic";
+import { BaseCommandSchema, commandList } from "../schema/generic";
 import { Card, Flex, Input, List, Typography } from "antd";
 
 const { Search } = Input;
 const { Title, Text } = Typography;
-
-const commandList: BaseCommandSchema[] = [
-  RestAPICommandSchema,
-  CallTransferCommandSchema,
-  PlayMediaCommandSchema,
-  HangupCommandSchema,
-];
 
 function FlowCommands({
   createNode,

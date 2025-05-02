@@ -102,7 +102,7 @@ function ObjectField({
                 <DropdownField
                   key={index}
                   value={object[field.key]}
-                  dropdownValues={{ "1": "1", "2": "2" }}
+                  field={field}
                   // dropdownValues={field?.values ? field.values : {}}
                   setValue={(value) => {
                     setObject({

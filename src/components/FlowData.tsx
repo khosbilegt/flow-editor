@@ -138,14 +138,12 @@ function FlowData({
               {field.type === "dropdown" && (
                 <DropdownField
                   value={localData[field.key]}
+                  field={field}
                   setValue={(val: string) => {
                     setLocalData({
                       ...localData,
                       [field.key]: val,
                     });
-                  }}
-                  dropdownValues={{
-                    test: "test",
                   }}
                   // dropdownValues={field?.values ? field.values : {}}
                   error={localErrors[field.key]}

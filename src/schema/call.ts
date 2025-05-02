@@ -87,8 +87,11 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
           name: "Media File",
           type: "dropdown",
           valueType: "api",
-          apiPath: "/api/audio",
-          expression: "",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
         },
         {
           key: "offsetMillis",

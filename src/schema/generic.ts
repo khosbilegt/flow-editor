@@ -43,6 +43,10 @@ type Field =
       type: "string" | "number" | "boolean" | "map" | "array" | "text";
       fields?: Field[];
       condition?: Condition;
+      isExpression?: boolean;
+      valueType?: "api" | "static";
+      apiPath?: string;
+      expression?: string;
     }
   | Dropdown
   | {
@@ -60,6 +64,9 @@ type Field =
       items: Field;
       fields: Field[];
       condition?: Condition;
+      valueType?: "api" | "static";
+      apiPath?: string;
+      expression?: string;
     }
   | {
       key: string;
@@ -67,6 +74,9 @@ type Field =
       type: "object";
       fields: Field[];
       condition?: Condition;
+      valueType?: "api" | "static";
+      apiPath?: string;
+      expression?: string;
     };
 
 interface BaseCommandSchema {
@@ -165,13 +175,58 @@ const RestAPICommandSchema: BaseCommandSchema = {
   },
 };
 
+const CheckConditionCommandSchema: BaseCommandSchema = {
+  command: "CheckConditionCommand",
+  type: "CHECK_CONDITION",
+  fields: {
+    expression: {
+      key: "expression",
+      name: "Expression",
+      isExpression: true,
+      type: "string",
+    },
+    dataObjects: {
+      key: "dataObjects",
+      name: "Data Objects",
+      type: "array",
+      itemType: "dropdown",
+      items: {
+        key: "dataObject",
+        name: "Data Object",
+        type: "dropdown",
+        valueType: "static",
+        values: {
+          GET: "GET",
+          POST: "POST",
+          PUT: "PUT",
+          DELETE: "DELETE",
+          PATCH: "PATCH",
+        },
+        expression: "",
+      },
+    },
+  },
+  edges: {
+    onTrue: {
+      name: "onTrue",
+      color: "#389E0D",
+    },
+    onFalse: {
+      name: "onFalse",
+      color: "#D32029",
+    },
+  },
+};
+
+const commandList: BaseCommandSchema[] = [
+  RestAPICommandSchema,
+  CallTransferCommandSchema,
+  PlayMediaCommandSchema,
+  HangupCommandSchema,
+  CheckConditionCommandSchema,
+];
+
 const getSchemaByCommand = (type: string): BaseCommandSchema | null => {
-  const commandList: BaseCommandSchema[] = [
-    RestAPICommandSchema,
-    CallTransferCommandSchema,
-    PlayMediaCommandSchema,
-    HangupCommandSchema,
-  ];
   const schema = commandList.find((schema) => schema.type === type);
   if (schema) {
     return schema;
@@ -188,4 +243,4 @@ export type {
   SchemaEdge,
   EditNodeData,
 };
-export { getSchemaByCommand, RestAPICommandSchema };
+export { getSchemaByCommand, RestAPICommandSchema, commandList };
