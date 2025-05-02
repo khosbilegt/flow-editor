@@ -35,25 +35,36 @@ type Field =
         | "string"
         | "number"
         | "boolean"
-        | "object"
+        | "map"
         | "array"
-        | "dropdown";
-      type: "string" | "number" | "boolean" | "object" | "array" | "text";
+        | "dropdown"
+        | "object";
+      type: "string" | "number" | "boolean" | "map" | "array" | "text";
+      fields?: Field[];
       condition?: Condition;
     }
   | Dropdown
   | {
       key: string;
       name: string;
-      type: "array" | "object";
+      type: "array" | "map";
       itemType?:
         | "string"
         | "number"
         | "boolean"
-        | "object"
+        | "map"
         | "array"
-        | "dropdown";
+        | "dropdown"
+        | "object";
       items: Field;
+      fields: Field[];
+      condition?: Condition;
+    }
+  | {
+      key: string;
+      name: string;
+      type: "object";
+      fields: Field[];
       condition?: Condition;
     };
 
@@ -111,7 +122,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
     queryParams: {
       key: "queryParams",
       name: "Query Parameters",
-      type: "object",
+      type: "map",
       itemType: "string",
       items: {
         key: "queryParam",
@@ -122,7 +133,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
     pathParams: {
       key: "pathParams",
       name: "Path Parameters",
-      type: "object",
+      type: "map",
       itemType: "number",
       items: {
         key: "pathParam",

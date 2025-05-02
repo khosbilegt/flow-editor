@@ -195,14 +195,14 @@ function FlowEditor({
           name: command.name,
           setName: (name: string) => {
             setCommands((prev) =>
-              prev.map((command: FlowCommand) => {
-                if (command.id === command.id) {
+              prev.map((prevCommand: FlowCommand) => {
+                if (prevCommand.id === command.id) {
                   return {
-                    ...command,
+                    ...prevCommand,
                     name: name,
                   };
                 }
-                return command;
+                return prevCommand;
               })
             );
           },
@@ -305,10 +305,7 @@ function FlowEditor({
         onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        onNodeDragStop={(e) => {
-          console.log("Drag over", e);
-          setCommands(updateCommandPositions(commands));
-        }}
+        onNodeDragStop={() => setCommands(updateCommandPositions(commands))}
         attributionPosition="bottom-right"
       >
         <Background />

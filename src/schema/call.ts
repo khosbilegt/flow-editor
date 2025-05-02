@@ -76,39 +76,31 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
   command: "PlayMediaCommand",
   type: "PLAY_MEDIA",
   fields: {
-    isInterruptible: {
-      key: "isInterruptible",
-      name: "Is Interruptible",
-      type: "boolean",
-    },
-    repeatCount: {
-      key: "repeatCount",
-      name: "Repeat Count",
-      type: "number",
-    },
-    offsetMillis: {
-      key: "offsetMillis",
-      name: "Offset Millis",
-      type: "number",
-    },
-    skipMillis: {
-      key: "skipMillis",
-      name: "Skip Millis",
-      type: "number",
-    },
     mediaList: {
       key: "mediaList",
       name: "Media List",
       type: "array",
-      itemType: "dropdown",
-      items: {
-        key: "mediaFile",
-        name: "Media File",
-        type: "dropdown",
-        valueType: "api",
-        apiPath: "/api/audio",
-        expression: "",
-      },
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "/api/audio",
+          expression: "",
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
     },
   },
   edges: {

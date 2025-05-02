@@ -6,8 +6,9 @@ import NumberField from "./data/NumberField";
 import StringField from "./data/StringField";
 import DropdownField from "./data/DropdownField";
 import ArrayField from "./data/ArrayField";
-import ObjectField from "./data/ObjectField";
 import TextField from "./data/TextField";
+import MapField from "./data/MapField";
+import ObjectField from "./data/ObjectField";
 
 function FlowData({
   editData,
@@ -22,7 +23,6 @@ function FlowData({
   const [localData, setLocalData] = useState<any>(editData?.data);
 
   const saveData = () => {
-    console.log(localName);
     if (editData) {
       setEditData({
         ...editData,
@@ -130,8 +130,8 @@ function FlowData({
                   dropdownValues={field?.values ? field.values : {}}
                 />
               )}
-              {field.type === "object" && (
-                <ObjectField
+              {field.type === "map" && (
+                <MapField
                   object={localData[field.key] ? localData[field.key] : {}}
                   itemType={field?.itemType ? field?.itemType : ""}
                   setObject={(object) => {
@@ -144,8 +144,15 @@ function FlowData({
               )}
               {field.type === "array" && (
                 <ArrayField
-                  items={localData[field.key] ? localData[field.key] : []}
+                  items={
+                    localData[field.key]
+                      ? Object.keys(localData[field.key]).map((key) => {
+                          return localData[field.key][key];
+                        })
+                      : []
+                  }
                   itemType={field?.itemType ? field?.itemType : ""}
+                  itemFields={field?.fields ? field?.fields : []}
                   setItems={(items) => {
                     setLocalData({
                       ...localData,
@@ -153,6 +160,9 @@ function FlowData({
                     });
                   }}
                 />
+              )}
+              {field.type === "object" && (
+                <ObjectField object={{}} setObject={() => {}} fields={[]} />
               )}
             </Form.Item>
           );

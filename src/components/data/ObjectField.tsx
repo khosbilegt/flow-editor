@@ -1,153 +1,121 @@
-import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import { Button, Flex, Input } from "antd";
+import { Field } from "@/schema/generic";
+import { Flex, Input } from "antd";
 import StringField from "./StringField";
 import NumberField from "./NumberField";
 import BooleanField from "./BooleanField";
+import MapField from "./MapField";
+import ArrayField from "./ArrayField";
+import DropdownField from "./DropdownField";
 
 function ObjectField({
-  itemType,
   object,
   setObject,
+  fields,
 }: {
-  itemType: string;
-  object: any;
-  setObject: (object: any) => void;
+  object: Record<string, any>;
+  setObject: (object: Record<string, any>) => void;
+  fields: Field[];
 }) {
   return (
     <Flex vertical gap={5}>
-      {Object.keys(object)?.map((key, index) => {
-        console.log("Inside", key, index);
+      {fields?.map((field, index) => {
         const renderField = () => {
-          switch (itemType) {
-            case "string": {
+          switch (field.type) {
+            case "string":
               return (
                 <StringField
                   key={index}
-                  value={object[key]}
+                  value={object[field.key]}
                   setValue={(value) => {
                     setObject({
                       ...object,
-                      [key]: value,
+                      [field.key]: value,
                     });
                   }}
                 />
               );
-            }
-            case "number": {
+            case "number":
               return (
                 <NumberField
                   key={index}
-                  value={object[key]}
+                  value={object[field.key]}
                   setValue={(value) => {
                     setObject({
                       ...object,
-                      [key]: value,
+                      [field.key]: value,
                     });
                   }}
                 />
               );
-            }
-            case "boolean": {
+            case "boolean":
               return (
                 <BooleanField
                   key={index}
-                  value={object[key]}
+                  value={object[field.key]}
                   setValue={(value) => {
                     setObject({
                       ...object,
-                      [key]: value,
+                      [field.key]: value,
                     });
                   }}
                 />
               );
-            }
-            case "object": {
+            case "map":
               return (
-                <ObjectField
+                <MapField
                   key={index}
-                  itemType={itemType}
-                  object={object[key]}
+                  itemType={field?.itemType ? field?.itemType : ""}
+                  object={object[field.key]}
                   setObject={(value) => {
                     setObject({
                       ...object,
-                      [key]: value,
+                      [field.key]: value,
                     });
                   }}
                 />
               );
-            }
-            case "array": {
+            case "array":
               return (
-                <ObjectField
+                <ArrayField
                   key={index}
-                  itemType={itemType}
-                  object={object[key]}
-                  setObject={(value) => {
+                  items={object[field.key]}
+                  setItems={(value) => {
                     setObject({
                       ...object,
-                      [key]: value,
+                      [field.key]: value,
                     });
                   }}
+                  itemType={field?.itemType ? field?.itemType : ""}
+                  itemFields={field?.fields ? field?.fields : []}
                 />
               );
-            }
-            case "dropdown": {
+            case "dropdown":
               return (
-                <Input
+                <DropdownField
                   key={index}
-                  value={object[key]}
-                  onChange={(e) => {
+                  value={object[field.key]}
+                  dropdownValues={{ "1": "1", "2": "2" }}
+                  // dropdownValues={field?.values ? field.values : {}}
+                  setValue={(value) => {
                     setObject({
                       ...object,
-                      [key]: e.target.value,
+                      [field.key]: value,
                     });
                   }}
                 />
               );
-            }
+            default:
+              return null;
           }
-          return <></>;
         };
+
         return (
-          <Flex gap={5}>
-            <Input
-              placeholder="Key"
-              value={key}
-              onChange={(e) => {
-                const newObject = { ...object };
-                newObject[e.target.value] = newObject[key];
-                delete newObject[key];
-                setObject(newObject);
-              }}
-            />
+          <Flex gap={5} key={index}>
+            <Input placeholder="Key" value={field.name} disabled />
             {renderField()}
-            <Button
-              danger
-              type="primary"
-              icon={<CloseCircleOutlined />}
-              style={{ width: "40px" }}
-              onClick={() => {
-                const newObject = { ...object };
-                delete newObject[key];
-                setObject(newObject);
-              }}
-            />
           </Flex>
         );
       })}
-      <Button
-        type="primary"
-        icon={<PlusCircleOutlined />}
-        onClick={() => {
-          const newKey = `newKey${Object.keys(object).length}`;
-          setObject({
-            ...object,
-            [newKey]: "",
-          });
-        }}
-      >
-        Add Field
-      </Button>
     </Flex>
   );
 }

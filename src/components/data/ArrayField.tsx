@@ -4,15 +4,19 @@ import StringField from "./StringField";
 import NumberField from "./NumberField";
 import BooleanField from "./BooleanField";
 import DropdownField from "./DropdownField";
+import ObjectField from "./ObjectField";
+import { Field } from "@/schema/generic";
 
 function ArrayField({
   itemType,
   items,
   setItems,
+  itemFields,
 }: {
   itemType: string;
   items: any[];
   setItems: (items: any[]) => void;
+  itemFields: Field[];
 }) {
   return (
     <Flex vertical gap={5}>
@@ -69,12 +73,26 @@ function ArrayField({
                 />
               );
             }
+            case "object": {
+              return (
+                <ObjectField
+                  key={index}
+                  fields={itemFields}
+                  object={item}
+                  setObject={(object) => {
+                    const newItems = [...items];
+                    newItems[index] = object;
+                    setItems(newItems);
+                  }}
+                />
+              );
+            }
             default:
               return null;
           }
         };
         return (
-          <Flex gap={10}>
+          <Flex gap={10} key={index}>
             {renderField()}
             <Button
               danger

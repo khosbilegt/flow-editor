@@ -73,15 +73,17 @@ function EditorLayout() {
           const fieldValue = command.fields[key];
           formattedCommand[key] = command.fields[key];
           if (typeof fieldValue === "object" && fieldValue !== null) {
-            // Convert the object to a list of { key: "key", expression: "value" }
-            formattedCommand[key] = Object.entries(fieldValue).map(
-              ([k, v]) => ({
-                key: k,
-                expression: v,
-              })
-            );
+            if (Array.isArray(fieldValue)) {
+              formattedCommand[key] = fieldValue;
+            } else {
+              formattedCommand[key] = Object.entries(fieldValue).map(
+                ([k, v]) => ({
+                  key: k,
+                  expression: v,
+                })
+              );
+            }
           } else {
-            // If it's not an object, assign it directly
             formattedCommand[key] = fieldValue;
           }
         });
@@ -158,7 +160,7 @@ function EditorLayout() {
 
   useEffect(() => {
     commandRef.current = commands;
-    console.log(commandRef.current);
+    console.log(commands);
   }, [commands]);
 
   useEffect(() => {

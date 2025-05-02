@@ -7,7 +7,7 @@ function DropdownField({
 }: {
   value: string;
   setValue: (value: string) => void;
-  dropdownValues: Record<string, string>; // Updated type
+  dropdownValues: Record<string, string>;
 }) {
   return (
     <Select showSearch value={value} onChange={setValue}>
