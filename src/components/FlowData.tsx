@@ -200,7 +200,7 @@ function FlowData({
         })}
       <Form.Item label={null}>
         <Flex gap={10}>
-          <Button type="primary" htmlType="submit" onClick={() => saveData()}>
+          <Button type="primary" onClick={() => saveData()}>
             Save
           </Button>
         </Flex>

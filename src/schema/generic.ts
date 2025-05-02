@@ -104,8 +104,11 @@ const RestAPICommandSchema: BaseCommandSchema = {
       name: "Rest Client ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "https://contactx.unitel.mn/api/data-objects",
-      expression: "",
+      apiPath: "http://localhost:8080/public/media",
+      expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
     },
     type: {
       key: "method",

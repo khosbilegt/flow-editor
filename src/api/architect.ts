@@ -45,56 +45,58 @@ export const architectAPI = createApi({
       },
       transformResponse: (response: any) => {
         const tempCommands: FlowCommand[] = [];
-        Object.keys(response?.commands).forEach((key) => {
-          let command = response?.commands[key];
-          let fields: Record<string, any> = {};
-          let edges: Record<string, any> = {};
-          Object.keys(command).forEach((fieldKey) => {
-            if (
-              ![
-                "id",
-                "name",
-                "type",
-                "positionX",
-                "positionY",
-                "fields",
-                "edges",
-                "errors",
-              ].includes(fieldKey)
-            ) {
-              if (fieldKey.startsWith("on")) {
-                edges[fieldKey] = {
-                  id: fieldKey,
-                  type: "flow",
-                  target: command[fieldKey],
-                };
-              } else {
-                if (command[fieldKey] && Array.isArray(command[fieldKey])) {
-                  let tempFieldMap: any = {};
-                  let tempFieldArray: any[] = [];
-                  command[fieldKey].forEach((item: any) => {
-                    if (item.key && item.expression) {
-                      tempFieldMap[item.key] = item.expression;
-                    } else {
-                      tempFieldArray.push(item);
-                    }
-                  });
-                  if (tempFieldArray.length > 0) {
-                    fields[fieldKey] = tempFieldArray;
-                  } else {
-                    fields[fieldKey] = tempFieldMap;
-                  }
+        Object.keys(response?.commands ? response?.commands : {}).forEach(
+          (key) => {
+            let command = response?.commands[key];
+            let fields: Record<string, any> = {};
+            let edges: Record<string, any> = {};
+            Object.keys(command).forEach((fieldKey) => {
+              if (
+                ![
+                  "id",
+                  "name",
+                  "type",
+                  "positionX",
+                  "positionY",
+                  "fields",
+                  "edges",
+                  "errors",
+                ].includes(fieldKey)
+              ) {
+                if (fieldKey.startsWith("on")) {
+                  edges[fieldKey] = {
+                    id: fieldKey,
+                    type: "flow",
+                    target: command[fieldKey],
+                  };
                 } else {
-                  fields[fieldKey] = command[fieldKey];
+                  if (command[fieldKey] && Array.isArray(command[fieldKey])) {
+                    let tempFieldMap: any = {};
+                    let tempFieldArray: any[] = [];
+                    command[fieldKey].forEach((item: any) => {
+                      if (item.key && item.expression) {
+                        tempFieldMap[item.key] = item.expression;
+                      } else {
+                        tempFieldArray.push(item);
+                      }
+                    });
+                    if (tempFieldArray.length > 0) {
+                      fields[fieldKey] = tempFieldArray;
+                    } else {
+                      fields[fieldKey] = tempFieldMap;
+                    }
+                  } else {
+                    fields[fieldKey] = command[fieldKey];
+                  }
                 }
+                delete command[fieldKey];
               }
-              delete command[fieldKey];
-            }
-          });
-          command["fields"] = fields;
-          command["edges"] = edges;
-          tempCommands.push(command);
-        });
+            });
+            command["fields"] = fields;
+            command["edges"] = edges;
+            tempCommands.push(command);
+          }
+        );
         const transformedResponse = {
           ...response,
           commands: tempCommands,

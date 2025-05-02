@@ -39,10 +39,13 @@ const edgeTypes = {
 };
 
 function FlowEditor({
+  handler,
   commands,
   setCommands,
+  setInitialCommandId,
 }: {
   handler: FlowHandler | undefined;
+  setInitialCommandId: (id: string) => void;
   commands: FlowCommand[];
   setCommands: React.Dispatch<React.SetStateAction<FlowCommand[]>>;
 }) {
@@ -201,6 +204,7 @@ function FlowEditor({
   };
 
   useEffect(() => {
+    console.log("Chnaging commands", handler);
     const tempNodes: Node<FlowNodeData>[] = [];
     const tempEdges: Edge[] = [];
     commands?.map((command) => {
@@ -212,6 +216,12 @@ function FlowEditor({
           y: command.positionY ? command.positionY : 0,
         },
         data: {
+          initialCommandId: handler?.initialCommandId
+            ? handler?.initialCommandId
+            : "",
+          setInitialCommandId: (id: string) => {
+            setInitialCommandId(id);
+          },
           schema: commandSchema ? commandSchema : RestAPICommandSchema,
           name: command.name,
           setName: (name: string) => {
@@ -252,8 +262,10 @@ function FlowEditor({
         });
       }
     });
+    console.log(tempNodes);
     setNodes(tempNodes);
     setEdges(tempEdges);
+    console.log("Commands changed");
   }, [commands]);
 
   useEffect(() => {

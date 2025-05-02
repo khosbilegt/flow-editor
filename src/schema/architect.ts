@@ -15,6 +15,7 @@ interface Flow {
 interface FlowHandler {
   handlerId: string;
   handlerName: string;
+  initialCommandId: string;
   lastModifiedDate: string;
   referencedHandlers: FlowHandler[];
   commands: Record<string, any>;

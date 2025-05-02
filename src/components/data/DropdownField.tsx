@@ -4,8 +4,6 @@ import { Select } from "antd";
 import { useEffect, useState } from "react";
 import jsonata from "jsonata";
 
-const { Option } = Select;
-
 function DropdownField({
   value,
   setValue,

@@ -262,9 +262,24 @@ function EditorLayout() {
           }}
         >
           <FlowEditor
-            handler={selectedHandler}
+            handler={selectedHandlerRef.current}
             commands={commands}
             setCommands={setCommands}
+            setInitialCommandId={(id) => {
+              console.log("setting ", id);
+              if (!selectedHandlerRef.current) return;
+
+              const updatedHandler = {
+                ...selectedHandlerRef.current,
+                initialCommandId: id,
+              };
+
+              selectedHandlerRef.current = updatedHandler;
+
+              setCommands((prevCommands) => [...prevCommands]);
+
+              console.log("Updated handler:", updatedHandler);
+            }}
           />
           <FloatButton
             onClick={() => save()}
