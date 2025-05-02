@@ -48,6 +48,7 @@ export const architectAPI = createApi({
         Object.keys(response?.commands).forEach((key) => {
           let command = response?.commands[key];
           let fields: Record<string, any> = {};
+          let edges: Record<string, any> = {};
           Object.keys(command).forEach((fieldKey) => {
             if (
               ![
@@ -61,11 +62,20 @@ export const architectAPI = createApi({
                 "errors",
               ].includes(fieldKey)
             ) {
-              fields[fieldKey] = command[fieldKey];
+              if (fieldKey.startsWith("on")) {
+                edges[fieldKey] = {
+                  id: fieldKey,
+                  type: "flow",
+                  target: command[fieldKey],
+                };
+              } else {
+                fields[fieldKey] = command[fieldKey];
+              }
               delete command[fieldKey];
             }
           });
           command["fields"] = fields;
+          command["edges"] = edges;
           tempCommands.push(command);
         });
         const transformedResponse = {

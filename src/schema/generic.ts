@@ -66,13 +66,15 @@ interface BaseCommandSchema {
 
 interface EditNodeData {
   id: string;
+  name: string;
+  setName: (name: string) => void;
   schema: BaseCommandSchema;
   data: any;
 }
 
 const RestAPICommandSchema: BaseCommandSchema = {
-  command: "RestAPICommand",
-  type: "REST_API",
+  command: "APICallCommand",
+  type: "API_CALL",
   fields: {
     dataObjectId: {
       key: "dataObjectId",
@@ -83,7 +85,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
       expression: "",
     },
     type: {
-      key: "type",
+      key: "method",
       name: "HTTP Method",
       type: "dropdown",
       valueType: "static",
@@ -95,17 +97,17 @@ const RestAPICommandSchema: BaseCommandSchema = {
         PATCH: "PATCH",
       },
     },
-    authorization: {
-      key: "authorization",
-      name: "Authorization Type",
-      type: "dropdown",
-      valueType: "static",
-      values: {
-        none: "None",
-        basic: "Basic",
-        bearer: "Bearer",
-      },
-    },
+    // authorization: {
+    //   key: "authorization",
+    //   name: "Authorization Type",
+    //   type: "dropdown",
+    //   valueType: "static",
+    //   values: {
+    //     none: "None",
+    //     basic: "Basic",
+    //     bearer: "Bearer",
+    //   },
+    // },
     queryParams: {
       key: "queryParams",
       name: "Query Parameters",

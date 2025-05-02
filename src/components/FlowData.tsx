@@ -1,5 +1,5 @@
 import { EditNodeData } from "@/schema/generic";
-import { Button, Flex, Form } from "antd";
+import { Button, Flex, Form, Input } from "antd";
 import { useEffect, useState } from "react";
 import BooleanField from "./data/BooleanField";
 import NumberField from "./data/NumberField";
@@ -18,24 +18,36 @@ function FlowData({
   setEditData: (data: EditNodeData | null) => void;
   closeModal: () => void;
 }) {
+  const [localName, setLocalName] = useState<string>(editData?.name || "");
   const [localData, setLocalData] = useState<any>(editData?.data);
 
   const saveData = () => {
+    console.log(localName);
     if (editData) {
       setEditData({
         ...editData,
+        name: localName,
         data: localData,
       });
+      editData?.setName(localName);
     }
     closeModal();
   };
 
   useEffect(() => {
+    setLocalName(editData?.name || "");
     setLocalData(editData?.data);
   }, [editData]);
 
   return (
     <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Name">
+        <Input
+          placeholder={"Name"}
+          value={localName}
+          onChange={(e) => setLocalName(e.target.value)}
+        />
+      </Form.Item>
       {editData?.schema?.fields &&
         Object.entries(editData.schema.fields).map(([key, field]) => {
           if (field.condition) {
@@ -120,12 +132,12 @@ function FlowData({
               )}
               {field.type === "object" && (
                 <ObjectField
-                  items={localData[field.key] ? localData[field.key] : []}
+                  object={localData[field.key] ? localData[field.key] : {}}
                   itemType={field?.itemType ? field?.itemType : ""}
-                  setItems={(items) => {
+                  setObject={(object) => {
                     setLocalData({
                       ...localData,
-                      [field.key]: items,
+                      [field.key]: object,
                     });
                   }}
                 />

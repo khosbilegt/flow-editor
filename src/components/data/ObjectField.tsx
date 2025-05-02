@@ -6,61 +6,118 @@ import BooleanField from "./BooleanField";
 
 function ObjectField({
   itemType,
-  items,
-  setItems,
+  object,
+  setObject,
 }: {
   itemType: string;
-  items: any[];
-  setItems: (items: any[]) => void;
+  object: any;
+  setObject: (object: any) => void;
 }) {
   return (
     <Flex vertical gap={5}>
-      {items?.map((item, index) => {
+      {Object.keys(object)?.map((key, index) => {
         const renderField = () => {
           switch (itemType) {
-            case "string":
+            case "string": {
               return (
                 <StringField
                   key={index}
-                  value={item}
+                  value={object[key]}
                   setValue={(value) => {
-                    const newItems = [...items];
-                    newItems[index] = value;
-                    setItems(newItems);
+                    setObject({
+                      ...object,
+                      [key]: value,
+                    });
                   }}
                 />
               );
-            case "number":
+            }
+            case "number": {
               return (
                 <NumberField
                   key={index}
-                  value={item}
+                  value={object[key]}
                   setValue={(value) => {
-                    const newItems = [...items];
-                    newItems[index] = value;
-                    setItems(newItems);
+                    setObject({
+                      ...object,
+                      [key]: value,
+                    });
                   }}
                 />
               );
-            case "boolean":
+            }
+            case "boolean": {
               return (
                 <BooleanField
                   key={index}
-                  value={item}
+                  value={object[key]}
                   setValue={(value) => {
-                    const newItems = [...items];
-                    newItems[index] = value;
-                    setItems(newItems);
+                    setObject({
+                      ...object,
+                      [key]: value,
+                    });
                   }}
                 />
               );
-            default:
-              return null;
+            }
+            case "object": {
+              return (
+                <ObjectField
+                  key={index}
+                  itemType={itemType}
+                  object={object[key]}
+                  setObject={(value) => {
+                    setObject({
+                      ...object,
+                      [key]: value,
+                    });
+                  }}
+                />
+              );
+            }
+            case "array": {
+              return (
+                <ObjectField
+                  key={index}
+                  itemType={itemType}
+                  object={object[key]}
+                  setObject={(value) => {
+                    setObject({
+                      ...object,
+                      [key]: value,
+                    });
+                  }}
+                />
+              );
+            }
+            case "dropdown": {
+              return (
+                <Input
+                  key={index}
+                  value={object[key]}
+                  onChange={(e) => {
+                    setObject({
+                      ...object,
+                      [key]: e.target.value,
+                    });
+                  }}
+                />
+              );
+            }
           }
+          return <></>;
         };
         return (
           <Flex gap={5}>
-            <Input placeholder="Key" />
+            <Input
+              placeholder="Key"
+              onChange={(e) => {
+                const newObject = { ...object };
+                newObject[e.target.value] = newObject[key];
+                delete newObject[key];
+                setObject(newObject);
+              }}
+            />
             {renderField()}
             <Button
               danger
@@ -68,9 +125,9 @@ function ObjectField({
               icon={<CloseCircleOutlined />}
               style={{ width: "40px" }}
               onClick={() => {
-                const newItems = [...items];
-                newItems.splice(index, 1);
-                setItems(newItems);
+                const newObject = { ...object };
+                delete newObject[key];
+                setObject(newObject);
               }}
             />
           </Flex>
@@ -80,8 +137,11 @@ function ObjectField({
         type="primary"
         icon={<PlusCircleOutlined />}
         onClick={() => {
-          const newItems = [...items, ""];
-          setItems(newItems);
+          const newKey = `newKey${Object.keys(object).length}`;
+          setObject({
+            ...object,
+            [newKey]: "",
+          });
         }}
       >
         Add Field

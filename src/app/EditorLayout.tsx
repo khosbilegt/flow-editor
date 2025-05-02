@@ -72,14 +72,20 @@ function EditorLayout() {
         Object.keys(formattedCommand.fields).forEach((key: string) => {
           formattedCommand[key] = command.fields[key];
         });
+        delete formattedCommand.fields;
+        Object.keys(formattedCommand.edges).forEach((key: string) => {
+          if (command?.edges && command?.edges[key]) {
+            formattedCommand[key] = command?.edges[key].target;
+          }
+        });
         commandMap[command.id] = formattedCommand;
+        delete commandMap[command.id].edges;
       });
       let updatedDefinition: FlowHandler = {
         ...selectedHandlerRef.current,
         commands: commandMap,
       };
-      console.log(updatedDefinition.commands);
-      console.log(flowIdRef.current);
+      console.log(updatedDefinition);
       updateFlowHandler({
         flowId: flowIdRef.current,
         data: updatedDefinition,

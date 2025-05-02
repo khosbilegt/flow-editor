@@ -10,14 +10,20 @@ const { Text } = Typography;
 export type FlowNodeData = {
   schema: BaseCommandSchema;
   name: string;
+  setName: (name: string) => void;
   deleteNode: (id: string) => void;
-  openNodeModal: (schema: BaseCommandSchema, id: string) => void;
+  openNodeModal: (
+    schema: BaseCommandSchema,
+    id: string,
+    name: string,
+    setName: (name: string) => void
+  ) => void;
 };
 
 export default memo(
   ({
     id,
-    data: { name, schema, deleteNode, openNodeModal },
+    data: { name, schema, setName, deleteNode, openNodeModal },
   }: NodeProps<Node<FlowNodeData>>) => {
     return (
       <Card
@@ -28,7 +34,7 @@ export default memo(
         actions={[
           <SettingOutlined
             key={"settings"}
-            onClick={() => openNodeModal(schema, id)}
+            onClick={() => openNodeModal(schema, id, name, setName)}
           />,
           <Popconfirm
             okText="Yes"

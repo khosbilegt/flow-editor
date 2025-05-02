@@ -100,10 +100,17 @@ function FlowEditor({
     onNodesChange([{ type: "remove", id }]);
   }, []);
 
-  const openNodeModal = (schema: BaseCommandSchema, id: string) => {
+  const openNodeModal = (
+    schema: BaseCommandSchema,
+    id: string,
+    name: string,
+    setName: (name: string) => void
+  ) => {
     setEditData({
       id: id,
       schema: schema,
+      name: name,
+      setName: setName,
       data: commands.find((command) => command.id === id)?.fields,
     });
     setEditCommandDrawerOpen(true);
@@ -186,6 +193,19 @@ function FlowEditor({
         data: {
           schema: commandSchema ? commandSchema : RestAPICommandSchema,
           name: command.name,
+          setName: (name: string) => {
+            setCommands((prev) =>
+              prev.map((command: FlowCommand) => {
+                if (command.id === command.id) {
+                  return {
+                    ...command,
+                    name: name,
+                  };
+                }
+                return command;
+              })
+            );
+          },
           deleteNode,
           openNodeModal,
         },
