@@ -62,17 +62,36 @@ function FlowEditor({
   >();
 
   const removeEdge = useCallback(
-    (id: string) => setEdges((els) => els.filter((edge) => edge.id !== id)),
+    (id: string, sourceCommandId: string, sourceHandlerId: string) => {
+      setEdges((els) => els.filter((edge) => edge.id !== id));
+      setCommands((prev) =>
+        prev.map((prevCommand: FlowCommand) => {
+          if (prevCommand.id === sourceCommandId) {
+            const updatedEdges = { ...prevCommand.edges };
+            delete updatedEdges[sourceHandlerId];
+            return {
+              ...prevCommand,
+              edges: updatedEdges,
+            };
+          }
+          return prevCommand;
+        })
+      );
+    },
     []
   );
 
   const onConnect = useCallback((params: Connection) => {
     setEdges((els) => {
+      console.log(params);
       const updatedEdges = addEdge(
         {
           ...params,
           type: "flow",
           data: {
+            sourceCommandId: params.source,
+            sourceHandlerId: params.sourceHandle,
+            targetCommandId: params.target,
             removeEdge: removeEdge,
           },
         },
@@ -224,6 +243,9 @@ function FlowEditor({
             target: edge.target,
             type: "flow",
             data: {
+              sourceCommandId: command.id,
+              sourceHandlerId: key,
+              targetCommandId: edge.target,
               removeEdge: removeEdge,
             },
           });

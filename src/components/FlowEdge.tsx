@@ -8,7 +8,14 @@ import {
 import { Button, Flex } from "antd";
 
 type FlowEdgeData = {
-  removeEdge: (id: string) => void;
+  sourceCommandId: string;
+  sourceHandlerId: string;
+  targetCommandId: string;
+  removeEdge: (
+    id: string,
+    sourceCommandId: string,
+    sourceHandlerId: string
+  ) => void;
 };
 
 export default function FlowEdge({
@@ -48,7 +55,8 @@ export default function FlowEdge({
             style={{ padding: 5, color: "red" }}
             danger
             onClick={() => {
-              data?.removeEdge(id);
+              console.log(data);
+              data?.removeEdge(id, data.sourceCommandId, data.sourceHandlerId);
             }}
           >
             <CloseCircleOutlined />

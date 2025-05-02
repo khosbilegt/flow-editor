@@ -108,10 +108,6 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
       name: "onSuccess",
       color: "#00FF00",
     },
-    onFailure: {
-      name: "onFailure",
-      color: "#FF0000",
-    },
   },
 };
 
