@@ -16,6 +16,7 @@ function ObjectField({
   return (
     <Flex vertical gap={5}>
       {Object.keys(object)?.map((key, index) => {
+        console.log("Inside", key, index);
         const renderField = () => {
           switch (itemType) {
             case "string": {
@@ -111,6 +112,7 @@ function ObjectField({
           <Flex gap={5}>
             <Input
               placeholder="Key"
+              value={key}
               onChange={(e) => {
                 const newObject = { ...object };
                 newObject[e.target.value] = newObject[key];

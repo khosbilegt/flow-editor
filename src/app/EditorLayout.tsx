@@ -70,7 +70,20 @@ function EditorLayout() {
       commandRef.current.forEach((command: FlowCommand) => {
         let formattedCommand: any = { ...command };
         Object.keys(formattedCommand.fields).forEach((key: string) => {
+          const fieldValue = command.fields[key];
           formattedCommand[key] = command.fields[key];
+          if (typeof fieldValue === "object" && fieldValue !== null) {
+            // Convert the object to a list of { key: "key", expression: "value" }
+            formattedCommand[key] = Object.entries(fieldValue).map(
+              ([k, v]) => ({
+                key: k,
+                expression: v,
+              })
+            );
+          } else {
+            // If it's not an object, assign it directly
+            formattedCommand[key] = fieldValue;
+          }
         });
         delete formattedCommand.fields;
         Object.keys(formattedCommand.edges).forEach((key: string) => {
