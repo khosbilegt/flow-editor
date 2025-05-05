@@ -145,7 +145,6 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
-                  // dropdownValues={field?.values ? field.values : {}}
                   error={localErrors[field.key]}
                 />
               )}
