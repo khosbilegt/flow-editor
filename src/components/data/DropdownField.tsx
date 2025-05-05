@@ -47,7 +47,7 @@ function DropdownField({
     if (field?.valueType === "api") {
       fetchDropdownValues(field.apiPath || "", field.expression || "");
     }
-    console.log(field);
+    // TODO: Handle static values
   }, [field]);
 
   return (

@@ -6,7 +6,7 @@ export const architectAPI = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:8080/public",
   }),
-  tagTypes: ["Flow", "FlowHandler"],
+  tagTypes: ["Flow", "FlowHandler", "FlowHandlerList"],
   endpoints: (build) => ({
     getFlowById: build.query<Flow, number>({
       query: (flowId) => `/flow/${flowId}`,
@@ -27,7 +27,7 @@ export const architectAPI = createApi({
       query: (data: { flowId: number; version: string }) =>
         `/flow/${data.flowId}/handler/list?version=${data.version}`,
       providesTags: (_) => {
-        return ["Flow", "FlowHandler"];
+        return ["Flow", "FlowHandler", "FlowHandlerList"];
       },
     }),
     getFlowHandlerById: build.query<
@@ -104,6 +104,34 @@ export const architectAPI = createApi({
         return transformedResponse;
       },
     }),
+    createFlowHandler: build.mutation<
+      {
+        status: string;
+        message: string;
+        data: FlowHandler;
+      },
+      {
+        flowId: number;
+        handlerName: string;
+        definitionVersion: string;
+      }
+    >({
+      query: (data: {
+        flowId: number;
+        handlerName: string;
+        definitionVersion: string;
+      }) => ({
+        url: `/flow/${data.flowId}/handler`,
+        method: "POST",
+        body: {
+          handlerName: data.handlerName,
+          definitionVersion: data.definitionVersion,
+        },
+      }),
+      invalidatesTags: (_) => {
+        return ["FlowHandlerList"];
+      },
+    }),
     updateFlowHandler: build.mutation<
       FlowHandler,
       {
@@ -120,6 +148,29 @@ export const architectAPI = createApi({
         return ["FlowHandler"];
       },
     }),
+    deleteFlowHandler: build.mutation<
+      {
+        status: string;
+        message: string;
+      },
+      {
+        flowId: number;
+        handlerId: string;
+        version: string;
+      }
+    >({
+      query: (data: {
+        flowId: number;
+        handlerId: string;
+        version: string;
+      }) => ({
+        url: `/flow/${data.flowId}/handler?handlerId=${data.handlerId}&version=${data.version}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_) => {
+        return ["FlowHandlerList"];
+      },
+    }),
   }),
 });
 
@@ -128,5 +179,7 @@ export const {
   useGetFlowHandlerByIdQuery,
   useListFlowHandlersQuery,
   useListFlowVersionQuery,
+  useCreateFlowHandlerMutation,
   useUpdateFlowHandlerMutation,
+  useDeleteFlowHandlerMutation,
 } = architectAPI;

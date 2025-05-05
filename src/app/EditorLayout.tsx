@@ -1,18 +1,30 @@
 import {
   Button,
+  Dropdown,
   Flex,
   FloatButton,
+  Form,
   Input,
   Layout,
+  Modal,
+  Popconfirm,
   Select,
   Spin,
   Typography,
 } from "antd";
 import FlowEditor from "../components/FlowEditor";
 import "@xyflow/react/dist/style.css";
-import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+  BranchesOutlined,
+  DeleteOutlined,
+  FileOutlined,
+  PlusOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
 import {
+  useCreateFlowHandlerMutation,
+  useDeleteFlowHandlerMutation,
   useGetFlowByIdQuery,
   useGetFlowHandlerByIdQuery,
   useListFlowHandlersQuery,
@@ -32,12 +44,14 @@ function EditorLayout() {
   const flowIdRef = useRef<number>(-1);
   const commandRef = useRef<FlowCommand[]>([]);
   const selectedHandlerRef = useRef<FlowHandler | undefined>(undefined);
+  const keyboardListenerInitialized = useRef(false);
   const [flowId, setFlowId] = useState<number>(-1);
   const [handlerId, setHandlerId] = useState<string>("MAIN");
   const [selectedVersion, setSelectedVersion] = useState<string>("");
   const [commands, setCommands] = useState<FlowCommand[]>([]);
-  const keyboardListenerInitialized = useRef(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [createModalType, setCreateModalType] = useState<string>("");
+  const [createModalValue, setCreateModalValue] = useState<string>("");
 
   const { data: flow } = useGetFlowByIdQuery(flowId, {
     skip: flowId === -1,
@@ -50,8 +64,12 @@ function EditorLayout() {
     }
   );
 
+  const [createFlowHandler] = useCreateFlowHandlerMutation();
+
   const [updateFlowHandler, { isLoading: isSaving }] =
     useUpdateFlowHandlerMutation();
+
+  const [deleteFlowHandler] = useDeleteFlowHandlerMutation();
 
   const { data: versions } = useListFlowVersionQuery(flowId, {
     skip: flowId === -1,
@@ -67,12 +85,10 @@ function EditorLayout() {
   const save = () => {
     if (selectedHandlerRef.current) {
       const commandMap: Record<string, FlowCommand> = {};
-      console.log("Saving", commandRef.current);
       commandRef.current.forEach((command: FlowCommand) => {
         let formattedCommand: any = { ...command };
         Object.keys(formattedCommand.fields).forEach((key: string) => {
           const fieldValue = command.fields[key];
-          console.log(fieldValue);
           formattedCommand[key] = command.fields[key];
           if (typeof fieldValue === "object" && fieldValue !== null) {
             if (Array.isArray(fieldValue)) {
@@ -102,7 +118,6 @@ function EditorLayout() {
         ...selectedHandlerRef.current,
         commands: commandMap,
       };
-      console.log(updatedDefinition);
       updateFlowHandler({
         flowId: flowIdRef.current,
         data: updatedDefinition,
@@ -161,7 +176,6 @@ function EditorLayout() {
   }, [selectedHandler]);
 
   useEffect(() => {
-    console.log(commands);
     commandRef.current = commands;
   }, [commands]);
 
@@ -208,7 +222,26 @@ function EditorLayout() {
                   window.location.href = `/${flowId}/${e}/${handlerId}`;
                 }}
               />
-              <Button type="primary" icon={<PlusOutlined />} />
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "1",
+                      label: "New Version",
+                      icon: <BranchesOutlined />,
+                      onClick: () => setCreateModalType("version"),
+                    },
+                    {
+                      key: "2",
+                      label: "New Handler",
+                      icon: <FileOutlined />,
+                      onClick: () => setCreateModalType("handler"),
+                    },
+                  ],
+                }}
+              >
+                <Button type="primary" icon={<PlusOutlined />} />
+              </Dropdown>
             </Flex>
             <Search
               placeholder="Search handler"
@@ -217,13 +250,10 @@ function EditorLayout() {
               enterButton
             />
             {handlers
-              ?.slice() // Create a shallow copy of the array to avoid mutating the original
+              ?.slice()
               .sort((a, b) => {
-                // Ensure "Main Handler" is always first
                 if (a.handlerId === "MAIN") return -1;
                 if (b.handlerId === "MAIN") return 1;
-
-                // Otherwise, sort alphabetically by handlerName
                 return a.handlerName.localeCompare(b.handlerName);
               })
               .map((handler, index) => {
@@ -236,20 +266,48 @@ function EditorLayout() {
                   return null;
                 }
                 return (
-                  <Button
+                  <Dropdown
                     key={index}
-                    style={{ width: "100%" }}
-                    onClick={() =>
-                      (window.location.href = `/${flowId}/${selectedVersion}/${handler.handlerId}`)
-                    }
-                    type={
-                      handler.handlerId === handlerId ? "primary" : "default"
-                    }
+                    trigger={["contextMenu"]}
+                    menu={{
+                      items: [
+                        {
+                          key: "1",
+                          label: (
+                            <Popconfirm
+                              title="Are you sure you want to delete this handler?"
+                              onConfirm={() => {
+                                deleteFlowHandler({
+                                  flowId: flowIdRef.current,
+                                  handlerId: handler.handlerId,
+                                  version: selectedVersion,
+                                });
+                              }}
+                            >
+                              <p>Delete</p>
+                            </Popconfirm>
+                          ),
+                          icon: <DeleteOutlined />,
+                          danger: true,
+                          disabled: handler.handlerId === "MAIN",
+                        },
+                      ],
+                    }}
                   >
-                    {handler.handlerId === "MAIN"
-                      ? "Main Handler"
-                      : handler.handlerName}
-                  </Button>
+                    <Button
+                      style={{ width: "100%" }}
+                      onClick={() =>
+                        (window.location.href = `/${flowId}/${selectedVersion}/${handler.handlerId}`)
+                      }
+                      type={
+                        handler.handlerId === handlerId ? "primary" : "default"
+                      }
+                    >
+                      {handler.handlerId === "MAIN"
+                        ? "Main Handler"
+                        : handler.handlerName}
+                    </Button>
+                  </Dropdown>
                 );
               })}
           </Flex>
@@ -266,7 +324,6 @@ function EditorLayout() {
             commands={commands}
             setCommands={setCommands}
             setInitialCommandId={(id) => {
-              console.log("setting ", id);
               if (!selectedHandlerRef.current) return;
 
               const updatedHandler = {
@@ -277,8 +334,6 @@ function EditorLayout() {
               selectedHandlerRef.current = updatedHandler;
 
               setCommands((prevCommands) => [...prevCommands]);
-
-              console.log("Updated handler:", updatedHandler);
             }}
           />
           <FloatButton
@@ -293,6 +348,38 @@ function EditorLayout() {
             }
           />
         </Content>
+        <Modal
+          title={createModalType === "version" ? "New Version" : "New Handler"}
+          open={createModalType?.length > 0}
+          onCancel={() => setCreateModalType("")}
+          onOk={() => {
+            if (createModalType === "version") {
+              console.log("Creating new version", createModalValue);
+            } else {
+              createFlowHandler({
+                flowId: flowIdRef.current,
+                handlerName: createModalValue,
+                definitionVersion: selectedVersion,
+              });
+              console.log("Creating new handler", createModalValue);
+            }
+          }}
+        >
+          <Form>
+            <Form.Item
+              label={createModalType === "version" ? "Version" : "Handler Name"}
+            >
+              <Input
+                onChange={(e) => setCreateModalValue(e.target.value)}
+                placeholder={
+                  createModalType === "version"
+                    ? "Version Name"
+                    : "Handler Name"
+                }
+              />
+            </Form.Item>
+          </Form>
+        </Modal>
       </Layout>
     </Layout>
   );

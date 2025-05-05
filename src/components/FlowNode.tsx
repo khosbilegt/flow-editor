@@ -55,7 +55,7 @@ export default memo(
           }
           style={{
             padding: "0px",
-            outline: initialCommandId === id ? "1px solid aqua" : "",
+            outline: initialCommandId === id ? "2px solid aqua" : "",
             borderColor: errors?.length ? "red" : "black",
             boxShadow: "0 0 3px rgba(0, 0, 0, 0.4)",
           }}

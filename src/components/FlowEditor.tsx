@@ -86,7 +86,6 @@ function FlowEditor({
 
   const onConnect = useCallback((params: Connection) => {
     setEdges((els) => {
-      console.log(params);
       const updatedEdges = addEdge(
         {
           ...params,
@@ -204,7 +203,6 @@ function FlowEditor({
   };
 
   useEffect(() => {
-    console.log("Chnaging commands", handler);
     const tempNodes: Node<FlowNodeData>[] = [];
     const tempEdges: Edge[] = [];
     commands?.map((command) => {
@@ -262,10 +260,8 @@ function FlowEditor({
         });
       }
     });
-    console.log(tempNodes);
     setNodes(tempNodes);
     setEdges(tempEdges);
-    console.log("Commands changed");
   }, [commands]);
 
   useEffect(() => {
