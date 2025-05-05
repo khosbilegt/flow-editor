@@ -48,9 +48,18 @@ const { Header, Content, Sider } = Layout;
 
 const { Title, Text } = Typography;
 
-function EditorLayout() {
+function App({
+  flowId,
+  initialVersion,
+  initialHandlerId,
+  navigateTo,
+}: {
+  flowId: number;
+  initialVersion: string;
+  initialHandlerId: string;
+  navigateTo: (flowId: number, version: string, handlerId: string) => void;
+}) {
   const dispatch = useDispatch();
-  const flowId = useSelector((state: RootState) => state.flow.flowId);
   const handlerId = useSelector((state: RootState) => state.flow.handlerId);
   const selectedVersion = useSelector(
     (state: RootState) => state.flow.selectedVersion
@@ -73,14 +82,21 @@ function EditorLayout() {
   const { data: handlers } = useListFlowHandlersQuery(
     { flowId, version: selectedVersion },
     {
-      skip: flowId === -1 || selectedVersion === "",
+      skip:
+        flowId === -1 ||
+        selectedVersion === "" ||
+        selectedVersion === "undefined" ||
+        selectedVersion === undefined,
     }
   );
 
   const { data: selectedHandler } = useGetFlowHandlerByIdQuery(
     { flowId, handlerId, version: selectedVersion },
     {
-      skip: flowId === -1 || selectedVersion === "",
+      skip:
+        flowId === -1 ||
+        selectedVersion === "undefined" ||
+        selectedVersion === undefined,
     }
   );
 
@@ -147,23 +163,25 @@ function EditorLayout() {
   };
 
   useEffect(() => {
-    if (flow?.deployedVersion && selectedVersion === "") {
-      window.location.replace(
-        `/${flowId}/${flow.deployedVersion}/${handlerId}`
-      );
+    if (
+      flow?.deployedVersion &&
+      (selectedVersion === undefined ||
+        selectedVersion === "undefined" ||
+        selectedVersion === "")
+    ) {
+      navigateTo(flowId, flow.deployedVersion, handlerId);
     }
   }, [flow]);
 
   useEffect(() => {
-    const pathParts = window.location.pathname.split("/");
-    const flowId = decodeURI(pathParts[1]);
-    const version = decodeURI(pathParts[2]);
-    const handlerId = decodeURI(pathParts[3]);
     flowIdRef.current = Number(flowId);
+    dispatch(setFlowId(flowId));
     dispatch(setFlowId(Number(flowId)));
-    dispatch(setHandlerId(handlerId));
-    dispatch(setSelectedVersion(version));
+    dispatch(setHandlerId(initialHandlerId));
+    dispatch(setSelectedVersion(initialVersion));
+  }, [flowId, initialHandlerId, initialVersion]);
 
+  useEffect(() => {
     if (keyboardListenerInitialized.current) return;
     keyboardListenerInitialized.current = true;
 
@@ -250,7 +268,7 @@ function EditorLayout() {
                   value: version.definitionVersion,
                 }))}
                 onChange={(e) => {
-                  window.location.href = `/${flowId}/${e}/${handlerId}`;
+                  navigateTo(flowId, e, handlerId);
                 }}
               />
               <Dropdown
@@ -328,7 +346,7 @@ function EditorLayout() {
                     <Button
                       style={{ width: "100%" }}
                       onClick={() =>
-                        (window.location.href = `/${flowId}/${selectedVersion}/${handler.handlerId}`)
+                        navigateTo(flowId, selectedVersion, handler.handlerId)
                       }
                       type={
                         handler.handlerId === handlerId ? "primary" : "default"
@@ -457,4 +475,4 @@ function EditorLayout() {
   );
 }
 
-export default EditorLayout;
+export default App;
