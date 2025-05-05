@@ -235,51 +235,51 @@ const MenuCommandSchema: BaseCommandSchema = {
   },
   edges: {
     onDTMF_0: {
-      name: "0",
+      name: "onDTMF_0",
       color: "black",
     },
     onDTMF_1: {
-      name: "1",
+      name: "onDTMF_1",
       color: "black",
     },
     onDTMF_2: {
-      name: "2",
+      name: "onDTMF_2",
       color: "black",
     },
     onDTMF_3: {
-      name: "3",
+      name: "onDTMF_3",
       color: "black",
     },
     onDTMF_4: {
-      name: "4",
+      name: "onDTMF_4",
       color: "black",
     },
     onDTMF_5: {
-      name: "5",
+      name: "onDTMF_5",
       color: "black",
     },
     onDTMF_6: {
-      name: "6",
+      name: "onDTMF_6",
       color: "black",
     },
     onDTMF_7: {
-      name: "7",
+      name: "onDTMF_7",
       color: "black",
     },
     onDTMF_8: {
-      name: "8",
+      name: "onDTMF_8",
       color: "black",
     },
     onDTMF_9: {
-      name: "9",
+      name: "onDTMF_9",
       color: "black",
     },
     onDTMF_AST: {
-      name: "*",
+      name: "onDTMF_*",
       color: "black",
     },
     onDTMF_HASH: {
-      name: "#",
+      name: "onDTMF_#",
       color: "black",
     },
     onIncorrectDTMF: {
@@ -293,9 +293,77 @@ const MenuCommandSchema: BaseCommandSchema = {
   },
 };
 
+const RecordVoicemailCommandSchema: BaseCommandSchema = {
+  command: "RecordVoicemailCommand",
+  type: "RECORD_VOICEMAIL",
+  fields: {
+    maxDuration: {
+      key: "maxDuration",
+      name: "Max Duration",
+      type: "number",
+    },
+    terminationDTMF: {
+      key: "terminationDTMF",
+      name: "Termination DTMF",
+      type: "dropdown",
+      valueType: "static",
+      values: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "0": "0",
+        "*": "*",
+        "#": "#",
+      },
+    },
+    mediaList: {
+      key: "mediaList",
+      name: "Media List",
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#00FF00",
+    },
+  },
+};
+
 export {
   CallTransferCommandSchema,
   PlayMediaCommandSchema,
   HangupCommandSchema,
   MenuCommandSchema,
+  RecordVoicemailCommandSchema,
 };

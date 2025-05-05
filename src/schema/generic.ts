@@ -4,6 +4,7 @@ import {
   HangupCommandSchema,
   MenuCommandSchema,
   PlayMediaCommandSchema,
+  RecordVoicemailCommandSchema,
 } from "./call";
 
 type APIParam = {
@@ -57,6 +58,7 @@ type Field =
       apiPath?: string;
       expression?: string;
       params?: APIParam[];
+      values?: Record<string, string>;
     }
   | Dropdown
   | {
@@ -77,6 +79,7 @@ type Field =
       valueType?: "api" | "static";
       apiPath?: string;
       expression?: string;
+      values?: Record<string, string>;
       params?: APIParam[];
     }
   | {
@@ -89,6 +92,7 @@ type Field =
       apiPath?: string;
       expression?: string;
       params?: APIParam[];
+      values?: Record<string, string>;
     };
 
 interface BaseCommandSchema {
@@ -324,6 +328,7 @@ const commandList: BaseCommandSchema[] = [
   SendMessageCommandSchema,
   SetVariableCommandSchema,
   MenuCommandSchema,
+  RecordVoicemailCommandSchema,
 ];
 
 const getSchemaByCommand = (type: string): BaseCommandSchema | null => {

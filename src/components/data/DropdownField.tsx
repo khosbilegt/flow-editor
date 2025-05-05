@@ -75,6 +75,15 @@ function DropdownField({
 
       const parsedPath = replaceUrlParams(field.apiPath || "", params);
       fetchDropdownValues(parsedPath, field.expression || "");
+    } else {
+      const tempDropdownValues: any[] = [];
+      Object.keys(field?.values || {}).forEach((key) => {
+        tempDropdownValues.push({
+          id: key,
+          label: field.values?.[key] ?? "",
+        });
+      });
+      setDropdownValues(tempDropdownValues);
     }
   }, [field]);
 
