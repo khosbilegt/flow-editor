@@ -119,6 +119,9 @@ function FlowEditor({
       els.filter((edge) => edge.source !== id && edge.target !== id)
     );
     onNodesChange([{ type: "remove", id }]);
+    setCommands((prev) =>
+      prev.filter((prevCommand: FlowCommand) => prevCommand.id !== id)
+    );
   }, []);
 
   const openNodeModal = (

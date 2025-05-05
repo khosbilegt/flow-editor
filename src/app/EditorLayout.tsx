@@ -58,7 +58,7 @@ function EditorLayout() {
 
   // -1 must not fetch.
   const flowIdRef = useRef<number>(-1);
-  const commandRef = useRef<FlowCommand[]>([]);
+  const commandsRef = useRef<FlowCommand[]>([]);
   const selectedHandlerRef = useRef<FlowHandler | undefined>(undefined);
   const keyboardListenerInitialized = useRef(false);
   const [commands, setCommands] = useState<FlowCommand[]>([]);
@@ -102,7 +102,7 @@ function EditorLayout() {
   const save = () => {
     if (selectedHandlerRef.current) {
       const commandMap: Record<string, FlowCommand> = {};
-      commandRef.current.forEach((command: FlowCommand) => {
+      commandsRef.current.forEach((command: FlowCommand) => {
         let formattedCommand: any = { ...command };
         Object.keys(formattedCommand.fields).forEach((key: string) => {
           const fieldValue = command.fields[key];
@@ -193,7 +193,7 @@ function EditorLayout() {
   }, [selectedHandler]);
 
   useEffect(() => {
-    commandRef.current = commands;
+    commandsRef.current = commands;
   }, [commands]);
 
   useEffect(() => {

@@ -55,7 +55,6 @@ export default function FlowEdge({
             style={{ padding: 5, color: "red" }}
             danger
             onClick={() => {
-              console.log(data);
               data?.removeEdge(id, data.sourceCommandId, data.sourceHandlerId);
             }}
           >

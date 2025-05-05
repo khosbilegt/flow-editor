@@ -232,7 +232,6 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
   },
 };
 
-// TODO: Add non-inject params
 const JumpCommandSchema: BaseCommandSchema = {
   command: "JumpCommand",
   type: "JUMP",
@@ -268,6 +267,52 @@ const JumpCommandSchema: BaseCommandSchema = {
   },
 };
 
+const SendMessageCommandSchema: BaseCommandSchema = {
+  command: "SendMessageCommand",
+  type: "SEND_MESSAGE",
+  fields: {
+    source: {
+      key: "source",
+      name: "Source",
+      type: "string",
+    },
+    message: {
+      key: "message",
+      name: "Message",
+      type: "string",
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#389E0D",
+    },
+  },
+};
+
+const SetVariableCommandSchema: BaseCommandSchema = {
+  command: "SetVariableCommand",
+  type: "SET_CONTEXT_VARIABLE",
+  fields: {
+    variableName: {
+      key: "variableName",
+      name: "Variable Name",
+      type: "string",
+    },
+    variableValue: {
+      key: "expression",
+      name: "Expression",
+      type: "string",
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#389E0D",
+    },
+  },
+};
+
 const commandList: BaseCommandSchema[] = [
   RestAPICommandSchema,
   CallTransferCommandSchema,
@@ -275,6 +320,8 @@ const commandList: BaseCommandSchema[] = [
   HangupCommandSchema,
   CheckConditionCommandSchema,
   JumpCommandSchema,
+  SendMessageCommandSchema,
+  SetVariableCommandSchema,
 ];
 
 const getSchemaByCommand = (type: string): BaseCommandSchema | null => {

@@ -61,13 +61,9 @@ function DropdownField({
     });
   }
 
+  // TODO: Implement field params (similar to condition).
   useEffect(() => {
     if (field?.valueType === "api") {
-      // let params = {
-      //   flowId: flowState.flowId,
-      //   handlerId: flowState.handlerId,
-      //   selectedVersion: flowState.selectedVersion || "",
-      // };
       let params: any = {};
       field?.params?.forEach((param: APIParam) => {
         if (param.source === "inject") {
@@ -78,7 +74,6 @@ function DropdownField({
       });
 
       const parsedPath = replaceUrlParams(field.apiPath || "", params);
-      console.log(parsedPath);
       fetchDropdownValues(parsedPath, field.expression || "");
     }
   }, [field]);
