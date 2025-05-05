@@ -2,7 +2,7 @@ import { BaseCommandSchema } from "./generic";
 
 const CallTransferCommandSchema: BaseCommandSchema = {
   command: "TransferCommand",
-  type: "CALL_TRANSFER",
+  type: "TRANSFER_COMMAND",
   fields: {
     transferType: {
       key: "transferType",
@@ -19,8 +19,8 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       name: "Agent ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "/api/agents",
-      expression: "",
+      apiPath: "http://localhost:8080/api/agents",
+      expression: "$",
       condition: {
         field: "transferType",
         type: "equals",
@@ -31,9 +31,14 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       key: "queueId",
       name: "Queue ID",
       type: "dropdown",
-      apiPath: "/api/queues",
+      apiPath: "http://localhost:8080/public/queue",
       valueType: "api",
-      expression: "",
+      expression: `$map($, function($v) {
+                  {
+                    "id": $v.queueId,
+                    "label": $v.queueName
+                  }
+                })`,
       condition: {
         field: "transferType",
         type: "equals",
@@ -45,19 +50,34 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       name: "Timeout",
       type: "number",
     },
-    ringingAudioList: {
-      key: "ringingAudioList",
-      name: "Ringing Audio List",
+    mediaList: {
+      key: "mediaList",
+      name: "Media List",
       type: "array",
-      itemType: "dropdown",
-      items: {
-        key: "mediaFile",
-        name: "Media File",
-        type: "dropdown",
-        valueType: "api",
-        apiPath: "/api/audio",
-        expression: "",
-      },
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
     },
   },
   edges: {

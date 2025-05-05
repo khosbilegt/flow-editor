@@ -36,14 +36,21 @@ function DropdownField({
     const expr = jsonata(expression || "");
     const result = await expr.evaluate(response);
     const tempDropdownValues: any[] = [];
-    result?.forEach((item: any) => {
-      if (item.id && item.label) {
-        tempDropdownValues.push({
-          id: item.id,
-          label: item.label,
-        });
-      }
-    });
+    if (!Array.isArray(result)) {
+      tempDropdownValues.push({
+        id: String(result.id),
+        label: result.label,
+      });
+    } else {
+      result?.forEach((item: any) => {
+        if (item.id && item.label) {
+          tempDropdownValues.push({
+            id: item.id,
+            label: item.label,
+          });
+        }
+      });
+    }
     setDropdownValues(tempDropdownValues);
   };
 
