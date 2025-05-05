@@ -38,4 +38,16 @@ interface FlowValidationError {
   errorMessage: string;
 }
 
-export type { Flow, FlowHandler, FlowCommand, FlowValidationError };
+interface DefaultBody {
+  status: string;
+  message: string;
+  data: any;
+}
+
+export type {
+  Flow,
+  FlowHandler,
+  FlowCommand,
+  FlowValidationError,
+  DefaultBody,
+};

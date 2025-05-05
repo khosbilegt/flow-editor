@@ -23,6 +23,7 @@ import {
 } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
 import {
+  useCloneFlowVersionMutation,
   useCreateFlowHandlerMutation,
   useDeleteFlowHandlerMutation,
   useGetFlowByIdQuery,
@@ -51,7 +52,7 @@ function EditorLayout() {
   const [commands, setCommands] = useState<FlowCommand[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [createModalType, setCreateModalType] = useState<string>("");
-  const [createModalValue, setCreateModalValue] = useState<string>("");
+  const [createModalValue, setCreateModalValue] = useState<any>({});
 
   const { data: flow } = useGetFlowByIdQuery(flowId, {
     skip: flowId === -1,
@@ -59,6 +60,13 @@ function EditorLayout() {
 
   const { data: handlers } = useListFlowHandlersQuery(
     { flowId, version: selectedVersion },
+    {
+      skip: flowId === -1 || selectedVersion === "",
+    }
+  );
+
+  const { data: selectedHandler } = useGetFlowHandlerByIdQuery(
+    { flowId, handlerId, version: selectedVersion },
     {
       skip: flowId === -1 || selectedVersion === "",
     }
@@ -75,12 +83,7 @@ function EditorLayout() {
     skip: flowId === -1,
   });
 
-  const { data: selectedHandler } = useGetFlowHandlerByIdQuery(
-    { flowId, handlerId, version: selectedVersion },
-    {
-      skip: flowId === -1 || selectedVersion === "",
-    }
-  );
+  const [cloneFlowVersion] = useCloneFlowVersionMutation();
 
   const save = () => {
     if (selectedHandlerRef.current) {
@@ -354,31 +357,72 @@ function EditorLayout() {
           onCancel={() => setCreateModalType("")}
           onOk={() => {
             if (createModalType === "version") {
-              console.log("Creating new version", createModalValue);
+              cloneFlowVersion({
+                flowId: flowIdRef.current,
+                toVersion: createModalValue?.toVersion,
+                fromVersion: createModalValue?.fromVersion,
+              });
+              setCreateModalType("");
             } else {
               createFlowHandler({
                 flowId: flowIdRef.current,
-                handlerName: createModalValue,
+                handlerName: createModalValue?.handlerName,
                 definitionVersion: selectedVersion,
               });
-              console.log("Creating new handler", createModalValue);
+              setCreateModalType("");
             }
           }}
         >
-          <Form>
-            <Form.Item
-              label={createModalType === "version" ? "Version" : "Handler Name"}
+          {createModalType === "version" && (
+            <Form
+              labelCol={{
+                span: 6,
+              }}
             >
-              <Input
-                onChange={(e) => setCreateModalValue(e.target.value)}
-                placeholder={
-                  createModalType === "version"
-                    ? "Version Name"
-                    : "Handler Name"
-                }
-              />
-            </Form.Item>
-          </Form>
+              <Form.Item label="Clone From">
+                <Select
+                  placeholder="Select version"
+                  style={{ width: "100%" }}
+                  options={versions?.map((version) => ({
+                    label: version.definitionVersion,
+                    value: version.definitionVersion,
+                  }))}
+                  onChange={(e) =>
+                    setCreateModalValue({
+                      ...createModalValue,
+                      fromVersion: e,
+                    })
+                  }
+                />
+              </Form.Item>
+              <Form.Item label="Version Name">
+                <Input
+                  onChange={(e) =>
+                    setCreateModalValue({
+                      ...createModalValue,
+                      toVersion: e.target.value,
+                    })
+                  }
+                  placeholder={"Enter version name (e.g. v1.0)"}
+                />
+              </Form.Item>
+            </Form>
+          )}
+          {createModalType === "handler" && (
+            <Form>
+              <Form.Item label={"Handler Name"}>
+                <Input
+                  onChange={(e) =>
+                    setCreateModalValue({
+                      ...createModalValue,
+                      handlerName: e.target.value,
+                    })
+                  }
+                  placeholder={"Enter handler name (e.g. MyHandler)"}
+                />
+              </Form.Item>
+            </Form>
+          )}
         </Modal>
       </Layout>
     </Layout>

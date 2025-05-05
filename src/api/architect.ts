@@ -1,12 +1,17 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Flow, FlowCommand, FlowHandler } from "@/schema/architect";
+import {
+  DefaultBody,
+  Flow,
+  FlowCommand,
+  FlowHandler,
+} from "@/schema/architect";
 
 export const architectAPI = createApi({
   reducerPath: "architectAPI",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:8080/public",
   }),
-  tagTypes: ["Flow", "FlowHandler", "FlowHandlerList"],
+  tagTypes: ["Flow", "FlowHandler", "FlowHandlerList", "VersionList"],
   endpoints: (build) => ({
     getFlowById: build.query<Flow, number>({
       query: (flowId) => `/flow/${flowId}`,
@@ -17,7 +22,7 @@ export const architectAPI = createApi({
     listFlowVersion: build.query<Flow[], number>({
       query: (flowId) => `/flow/${flowId}/version`,
       providesTags: (_) => {
-        return ["Flow"];
+        return ["Flow", "VersionList"];
       },
     }),
     listFlowHandlers: build.query<
@@ -105,11 +110,7 @@ export const architectAPI = createApi({
       },
     }),
     createFlowHandler: build.mutation<
-      {
-        status: string;
-        message: string;
-        data: FlowHandler;
-      },
+      DefaultBody,
       {
         flowId: number;
         handlerName: string;
@@ -149,10 +150,7 @@ export const architectAPI = createApi({
       },
     }),
     deleteFlowHandler: build.mutation<
-      {
-        status: string;
-        message: string;
-      },
+      DefaultBody,
       {
         flowId: number;
         handlerId: string;
@@ -171,6 +169,26 @@ export const architectAPI = createApi({
         return ["FlowHandlerList"];
       },
     }),
+    cloneFlowVersion: build.mutation<
+      any,
+      {
+        flowId: number;
+        fromVersion: string;
+        toVersion: string;
+      }
+    >({
+      query: (data) => ({
+        url: `/flow/${data.flowId}/version`,
+        method: "POST",
+        body: {
+          fromVersion: data.fromVersion,
+          toVersion: data.toVersion,
+        },
+      }),
+      invalidatesTags: (_) => {
+        return ["VersionList"];
+      },
+    }),
   }),
 });
 
@@ -182,4 +200,5 @@ export const {
   useCreateFlowHandlerMutation,
   useUpdateFlowHandlerMutation,
   useDeleteFlowHandlerMutation,
+  useCloneFlowVersionMutation,
 } = architectAPI;
