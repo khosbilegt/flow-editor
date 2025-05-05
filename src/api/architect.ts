@@ -9,7 +9,7 @@ import {
 export const architectAPI = createApi({
   reducerPath: "architectAPI",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8080/public",
+    baseUrl: "https://api-dev-cec.unitel.mn:8000/architect/v2/public",
   }),
   tagTypes: ["Flow", "FlowHandler", "FlowHandlerList", "VersionList"],
   endpoints: (build) => ({
