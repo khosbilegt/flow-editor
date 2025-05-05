@@ -5,6 +5,13 @@ import {
   PlayMediaCommandSchema,
 } from "./call";
 
+type APIParam = {
+  key: string;
+  type: "string" | "number" | "boolean";
+  source: "field" | "inject";
+  injectKey?: string;
+};
+
 type Condition = {
   field: string;
   type: "equals" | "regex";
@@ -19,6 +26,7 @@ type Dropdown = {
   valueType: "api" | "static";
   apiPath?: string;
   values?: Record<string, string>;
+  params?: APIParam[];
   condition?: Condition;
   expression?: string;
 };
@@ -47,6 +55,7 @@ type Field =
       valueType?: "api" | "static";
       apiPath?: string;
       expression?: string;
+      params?: APIParam[];
     }
   | Dropdown
   | {
@@ -67,6 +76,7 @@ type Field =
       valueType?: "api" | "static";
       apiPath?: string;
       expression?: string;
+      params?: APIParam[];
     }
   | {
       key: string;
@@ -77,6 +87,7 @@ type Field =
       valueType?: "api" | "static";
       apiPath?: string;
       expression?: string;
+      params?: APIParam[];
     };
 
 interface BaseCommandSchema {
@@ -221,12 +232,49 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
   },
 };
 
+// TODO: Add non-inject params
+const JumpCommandSchema: BaseCommandSchema = {
+  command: "JumpCommand",
+  type: "JUMP",
+  fields: {
+    target: {
+      key: "handlerId",
+      name: "Target",
+      type: "dropdown",
+      valueType: "api",
+      apiPath:
+        "http://localhost:8080/public/flow/${flowId}/handler/list?version=${version}",
+      params: [
+        {
+          key: "flowId",
+          type: "number",
+          source: "inject",
+          injectKey: "flowId",
+        },
+        {
+          key: "version",
+          type: "string",
+          source: "inject",
+          injectKey: "selectedVersion",
+        },
+      ],
+      expression: `$map($, function($v) {
+                  {
+                    "id": $v.handlerId,
+                    "label": $v.handlerName ? $v.handlerName : $v.handlerId
+                  }
+                })`,
+    },
+  },
+};
+
 const commandList: BaseCommandSchema[] = [
   RestAPICommandSchema,
   CallTransferCommandSchema,
   PlayMediaCommandSchema,
   HangupCommandSchema,
   CheckConditionCommandSchema,
+  JumpCommandSchema,
 ];
 
 const getSchemaByCommand = (type: string): BaseCommandSchema | null => {
@@ -245,5 +293,6 @@ export type {
   Dropdown,
   SchemaEdge,
   EditNodeData,
+  APIParam,
 };
 export { getSchemaByCommand, RestAPICommandSchema, commandList };

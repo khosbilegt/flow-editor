@@ -1,15 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { architectAPI } from "../api/architect"; // Import the architectAPI
+import { architectAPI } from "../api/architect";
+import flowReducer from "../context/FlowContext";
 
 export const store = configureStore({
   reducer: {
-    [architectAPI.reducerPath]: architectAPI.reducer, // Add the architectAPI reducer
+    [architectAPI.reducerPath]: architectAPI.reducer,
+    flow: flowReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(architectAPI.middleware), // Add the architectAPI middleware
+    getDefaultMiddleware().concat(architectAPI.middleware),
 });
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;

@@ -34,22 +34,33 @@ import {
   useUpdateFlowHandlerMutation,
 } from "../api/architect";
 import { FlowCommand, FlowHandler } from "@/schema/architect";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setFlowId,
+  setHandlerId,
+  setSelectedVersion,
+} from "../context/FlowContext";
+import { RootState } from "./store";
 
 const { Search } = Input;
 
 const { Header, Content, Sider } = Layout;
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 function EditorLayout() {
+  const dispatch = useDispatch();
+  const flowId = useSelector((state: RootState) => state.flow.flowId);
+  const handlerId = useSelector((state: RootState) => state.flow.handlerId);
+  const selectedVersion = useSelector(
+    (state: RootState) => state.flow.selectedVersion
+  );
+
   // -1 must not fetch.
   const flowIdRef = useRef<number>(-1);
   const commandRef = useRef<FlowCommand[]>([]);
   const selectedHandlerRef = useRef<FlowHandler | undefined>(undefined);
   const keyboardListenerInitialized = useRef(false);
-  const [flowId, setFlowId] = useState<number>(-1);
-  const [handlerId, setHandlerId] = useState<string>("MAIN");
-  const [selectedVersion, setSelectedVersion] = useState<string>("");
   const [commands, setCommands] = useState<FlowCommand[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [createModalType, setCreateModalType] = useState<string>("");
@@ -149,9 +160,9 @@ function EditorLayout() {
     const version = decodeURI(pathParts[2]);
     const handlerId = decodeURI(pathParts[3]);
     flowIdRef.current = Number(flowId);
-    setFlowId(Number(flowId));
-    setHandlerId(handlerId);
-    setSelectedVersion(version);
+    dispatch(setFlowId(Number(flowId)));
+    dispatch(setHandlerId(handlerId));
+    dispatch(setSelectedVersion(version));
 
     if (keyboardListenerInitialized.current) return;
     keyboardListenerInitialized.current = true;
@@ -204,11 +215,10 @@ function EditorLayout() {
         }}
       >
         <Flex align="center">
-          <Title level={3} editable>
-            {flow?.flowName}
-          </Title>
+          <Title level={4}>{flow?.flowName}</Title>
         </Flex>
         <Flex align="center" gap={10}>
+          <Button type="primary">Edit</Button>
           <Popconfirm
             title="Are you sure you want to deploy this version?"
             onConfirm={() => {
@@ -229,6 +239,7 @@ function EditorLayout() {
       <Layout style={{ padding: "15px" }}>
         <Sider style={{ background: "none" }}>
           <Flex vertical gap={5}>
+            <Text type="secondary">Deployed: {flow?.deployedVersion}</Text>
             <Flex justify="space-between" gap={5}>
               <Select
                 placeholder="Version"
