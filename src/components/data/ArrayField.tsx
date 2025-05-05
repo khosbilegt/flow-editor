@@ -4,15 +4,22 @@ import StringField from "./StringField";
 import NumberField from "./NumberField";
 import BooleanField from "./BooleanField";
 import DropdownField from "./DropdownField";
+import ObjectField from "./ObjectField";
+import { Field } from "@/schema/generic";
+import { FlowValidationError } from "@/schema/architect";
 
 function ArrayField({
   itemType,
   items,
   setItems,
+  itemFields,
+  error,
 }: {
   itemType: string;
   items: any[];
   setItems: (items: any[]) => void;
+  itemFields: Field[];
+  error?: FlowValidationError | null | undefined;
 }) {
   return (
     <Flex vertical gap={5}>
@@ -29,6 +36,7 @@ function ArrayField({
                     newItems[index] = value;
                     setItems(newItems);
                   }}
+                  error={error}
                 />
               );
             case "number":
@@ -41,6 +49,7 @@ function ArrayField({
                     newItems[index] = value;
                     setItems(newItems);
                   }}
+                  error={error}
                 />
               );
             case "boolean":
@@ -53,6 +62,7 @@ function ArrayField({
                     newItems[index] = value;
                     setItems(newItems);
                   }}
+                  error={error}
                 />
               );
             case "dropdown": {
@@ -66,6 +76,22 @@ function ArrayField({
                     setItems(newItems);
                   }}
                   dropdownValues={{ key1: "value1", key2: "value2" }}
+                  error={error}
+                />
+              );
+            }
+            case "object": {
+              return (
+                <ObjectField
+                  key={index}
+                  fields={itemFields}
+                  object={item}
+                  setObject={(object) => {
+                    const newItems = [...items];
+                    newItems[index] = object;
+                    setItems(newItems);
+                  }}
+                  error={error}
                 />
               );
             }
@@ -74,7 +100,7 @@ function ArrayField({
           }
         };
         return (
-          <Flex gap={10}>
+          <Flex gap={10} key={index}>
             {renderField()}
             <Button
               danger

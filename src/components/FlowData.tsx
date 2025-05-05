@@ -1,13 +1,17 @@
 import { EditNodeData } from "@/schema/generic";
-import { Button, Flex, Form } from "antd";
+import { Alert, Button, Flex, Form, Input, Typography } from "antd";
 import { useEffect, useState } from "react";
 import BooleanField from "./data/BooleanField";
 import NumberField from "./data/NumberField";
 import StringField from "./data/StringField";
 import DropdownField from "./data/DropdownField";
 import ArrayField from "./data/ArrayField";
-import ObjectField from "./data/ObjectField";
 import TextField from "./data/TextField";
+import MapField from "./data/MapField";
+import ObjectField from "./data/ObjectField";
+import { FlowValidationError } from "@/schema/architect";
+
+const { Text } = Typography;
 
 function FlowData({
   editData,
@@ -18,24 +22,45 @@ function FlowData({
   setEditData: (data: EditNodeData | null) => void;
   closeModal: () => void;
 }) {
+  const [localName, setLocalName] = useState<string>(editData?.name || "");
   const [localData, setLocalData] = useState<any>(editData?.data);
+  const [localErrors, setLocalErrors] = useState<
+    Record<string, FlowValidationError>
+  >({});
 
   const saveData = () => {
     if (editData) {
       setEditData({
         ...editData,
+        name: localName,
         data: localData,
       });
+      editData?.setName(localName);
     }
     closeModal();
   };
 
   useEffect(() => {
+    setLocalName(editData?.name || "");
     setLocalData(editData?.data);
+    let tempErrors: Record<string, FlowValidationError> = {};
+    if (editData?.errors) {
+      editData.errors.forEach((error) => {
+        tempErrors[error.field] = error;
+      });
+    }
+    setLocalErrors(tempErrors);
   }, [editData]);
 
   return (
-    <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+    <Form labelCol={{ span: 10 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Name">
+        <Input
+          placeholder={"Name"}
+          value={localName}
+          onChange={(e) => setLocalName(e.target.value)}
+        />
+      </Form.Item>
       {editData?.schema?.fields &&
         Object.entries(editData.schema.fields).map(([key, field]) => {
           if (field.condition) {
@@ -71,6 +96,7 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "text" && (
@@ -82,6 +108,7 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "number" && (
@@ -93,6 +120,7 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "boolean" && (
@@ -104,55 +132,91 @@ function FlowData({
                       [field.key]: val,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "dropdown" && (
                 <DropdownField
                   value={localData[field.key]}
+                  field={field}
                   setValue={(val: string) => {
                     setLocalData({
                       ...localData,
                       [field.key]: val,
                     });
                   }}
-                  dropdownValues={field?.values ? field.values : {}}
+                  // dropdownValues={field?.values ? field.values : {}}
+                  error={localErrors[field.key]}
                 />
               )}
-              {field.type === "object" && (
-                <ObjectField
-                  items={localData[field.key] ? localData[field.key] : []}
+              {field.type === "map" && (
+                <MapField
+                  object={localData[field.key] ? localData[field.key] : {}}
                   itemType={field?.itemType ? field?.itemType : ""}
-                  setItems={(items) => {
+                  setObject={(object) => {
                     setLocalData({
                       ...localData,
-                      [field.key]: items,
+                      [field.key]: object,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
               )}
               {field.type === "array" && (
                 <ArrayField
-                  items={localData[field.key] ? localData[field.key] : []}
+                  items={
+                    localData[field.key]
+                      ? Object.keys(localData[field.key]).map((key) => {
+                          return localData[field.key][key];
+                        })
+                      : []
+                  }
                   itemType={field?.itemType ? field?.itemType : ""}
+                  itemFields={field?.fields ? field?.fields : []}
                   setItems={(items) => {
                     setLocalData({
                       ...localData,
                       [field.key]: items,
                     });
                   }}
+                  error={localErrors[field.key]}
                 />
+              )}
+              {field.type === "object" && (
+                <ObjectField
+                  object={{}}
+                  setObject={() => {}}
+                  fields={[]}
+                  error={localErrors[field.key]}
+                />
+              )}
+              {localErrors[field.key] && (
+                <Text style={{ color: "red" }}>
+                  {localErrors[field.key].errorMessage}
+                </Text>
               )}
             </Form.Item>
           );
         })}
       <Form.Item label={null}>
         <Flex gap={10}>
-          <Button type="primary" htmlType="submit" onClick={() => saveData()}>
+          <Button type="primary" onClick={() => saveData()}>
             Save
           </Button>
-          <Button htmlType="submit">Cancel</Button>
         </Flex>
       </Form.Item>
+      {editData?.errors?.map((error, index) => {
+        if (error?.field?.startsWith("on")) {
+          return (
+            <Alert
+              key={index}
+              message={error.field}
+              description={error.errorMessage}
+              type="error"
+            />
+          );
+        }
+      })}
     </Form>
   );
 }

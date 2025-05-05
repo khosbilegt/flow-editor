@@ -1,4 +1,19 @@
-import { CallTransferCommandSchema, PlayMediaCommandSchema } from "./call";
+import { FlowValidationError } from "./architect";
+import {
+  CallTransferCommandSchema,
+  CollectDTMFCommandSchema,
+  HangupCommandSchema,
+  MenuCommandSchema,
+  PlayMediaCommandSchema,
+  RecordVoicemailCommandSchema,
+} from "./call";
+
+type APIParam = {
+  key: string;
+  type: "string" | "number" | "boolean";
+  source: "field" | "inject";
+  injectKey?: string;
+};
 
 type Condition = {
   field: string;
@@ -14,6 +29,7 @@ type Dropdown = {
   valueType: "api" | "static";
   apiPath?: string;
   values?: Record<string, string>;
+  params?: APIParam[];
   condition?: Condition;
   expression?: string;
 };
@@ -31,53 +47,88 @@ type Field =
         | "string"
         | "number"
         | "boolean"
-        | "object"
+        | "map"
         | "array"
-        | "dropdown";
-      type: "string" | "number" | "boolean" | "object" | "array" | "text";
+        | "dropdown"
+        | "object";
+      type: "string" | "number" | "boolean" | "map" | "array" | "text";
+      fields?: Field[];
       condition?: Condition;
+      isExpression?: boolean;
+      valueType?: "api" | "static";
+      apiPath?: string;
+      expression?: string;
+      params?: APIParam[];
+      values?: Record<string, string>;
     }
   | Dropdown
   | {
       key: string;
       name: string;
-      type: "array" | "object";
+      type: "array" | "map";
       itemType?:
         | "string"
         | "number"
         | "boolean"
-        | "object"
+        | "map"
         | "array"
-        | "dropdown";
+        | "dropdown"
+        | "object";
       items: Field;
+      fields: Field[];
       condition?: Condition;
+      valueType?: "api" | "static";
+      apiPath?: string;
+      expression?: string;
+      values?: Record<string, string>;
+      params?: APIParam[];
+    }
+  | {
+      key: string;
+      name: string;
+      type: "object";
+      fields: Field[];
+      condition?: Condition;
+      valueType?: "api" | "static";
+      apiPath?: string;
+      expression?: string;
+      params?: APIParam[];
+      values?: Record<string, string>;
     };
 
 interface BaseCommandSchema {
   command: string;
+  type: string;
   fields: Record<string, Field>;
   edges?: Record<string, SchemaEdge>;
 }
 
 interface EditNodeData {
   id: string;
+  name: string;
+  setName: (name: string) => void;
   schema: BaseCommandSchema;
   data: any;
+  errors: FlowValidationError[];
 }
 
 const RestAPICommandSchema: BaseCommandSchema = {
-  command: "RestAPICommand",
+  command: "APICallCommand",
+  type: "API_CALL",
   fields: {
     dataObjectId: {
-      key: "dataObjectId",
-      name: "Data Object ID",
+      key: "restClientId",
+      name: "Rest Client ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "https://contactx.unitel.mn/api/data-objects",
-      expression: "",
+      apiPath: "http://localhost:8080/public/media",
+      expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
     },
     type: {
-      key: "type",
+      key: "method",
       name: "HTTP Method",
       type: "dropdown",
       valueType: "static",
@@ -89,21 +140,21 @@ const RestAPICommandSchema: BaseCommandSchema = {
         PATCH: "PATCH",
       },
     },
-    authorization: {
-      key: "authorization",
-      name: "Authorization Type",
-      type: "dropdown",
-      valueType: "static",
-      values: {
-        none: "None",
-        basic: "Basic",
-        bearer: "Bearer",
-      },
-    },
+    // authorization: {
+    //   key: "authorization",
+    //   name: "Authorization Type",
+    //   type: "dropdown",
+    //   valueType: "static",
+    //   values: {
+    //     none: "None",
+    //     basic: "Basic",
+    //     bearer: "Bearer",
+    //   },
+    // },
     queryParams: {
       key: "queryParams",
       name: "Query Parameters",
-      type: "object",
+      type: "map",
       itemType: "string",
       items: {
         key: "queryParam",
@@ -114,7 +165,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
     pathParams: {
       key: "pathParams",
       name: "Path Parameters",
-      type: "object",
+      type: "map",
       itemType: "number",
       items: {
         key: "pathParam",
@@ -144,13 +195,146 @@ const RestAPICommandSchema: BaseCommandSchema = {
   },
 };
 
-const getSchemaByCommand = (command: string): BaseCommandSchema | null => {
-  const commandList: BaseCommandSchema[] = [
-    RestAPICommandSchema,
-    CallTransferCommandSchema,
-    PlayMediaCommandSchema,
-  ];
-  const schema = commandList.find((schema) => schema.command === command);
+const CheckConditionCommandSchema: BaseCommandSchema = {
+  command: "CheckConditionCommand",
+  type: "CHECK_CONDITION",
+  fields: {
+    expression: {
+      key: "expression",
+      name: "Expression",
+      isExpression: true,
+      type: "string",
+    },
+    dataObjects: {
+      key: "dataObjects",
+      name: "Data Objects",
+      type: "array",
+      itemType: "dropdown",
+      items: {
+        key: "dataObject",
+        name: "Data Object",
+        type: "dropdown",
+        valueType: "static",
+        values: {
+          GET: "GET",
+          POST: "POST",
+          PUT: "PUT",
+          DELETE: "DELETE",
+          PATCH: "PATCH",
+        },
+        expression: "",
+      },
+    },
+  },
+  edges: {
+    onTrue: {
+      name: "onTrue",
+      color: "#389E0D",
+    },
+    onFalse: {
+      name: "onFalse",
+      color: "#D32029",
+    },
+  },
+};
+
+const JumpCommandSchema: BaseCommandSchema = {
+  command: "JumpCommand",
+  type: "JUMP",
+  fields: {
+    target: {
+      key: "handlerId",
+      name: "Target",
+      type: "dropdown",
+      valueType: "api",
+      apiPath:
+        "http://localhost:8080/public/flow/${flowId}/handler/list?version=${version}",
+      params: [
+        {
+          key: "flowId",
+          type: "number",
+          source: "inject",
+          injectKey: "flowId",
+        },
+        {
+          key: "version",
+          type: "string",
+          source: "inject",
+          injectKey: "selectedVersion",
+        },
+      ],
+      expression: `$map($, function($v) {
+                  {
+                    "id": $v.handlerId,
+                    "label": $v.handlerName ? $v.handlerName : $v.handlerId
+                  }
+                })`,
+    },
+  },
+};
+
+const SendMessageCommandSchema: BaseCommandSchema = {
+  command: "SendMessageCommand",
+  type: "SEND_MESSAGE",
+  fields: {
+    source: {
+      key: "source",
+      name: "Source",
+      type: "string",
+    },
+    message: {
+      key: "message",
+      name: "Message",
+      type: "string",
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#389E0D",
+    },
+  },
+};
+
+const SetVariableCommandSchema: BaseCommandSchema = {
+  command: "SetVariableCommand",
+  type: "SET_CONTEXT_VARIABLE",
+  fields: {
+    variableName: {
+      key: "variableName",
+      name: "Variable Name",
+      type: "string",
+    },
+    variableValue: {
+      key: "expression",
+      name: "Expression",
+      type: "string",
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#389E0D",
+    },
+  },
+};
+
+const commandList: BaseCommandSchema[] = [
+  RestAPICommandSchema,
+  CallTransferCommandSchema,
+  PlayMediaCommandSchema,
+  HangupCommandSchema,
+  CheckConditionCommandSchema,
+  JumpCommandSchema,
+  SendMessageCommandSchema,
+  SetVariableCommandSchema,
+  MenuCommandSchema,
+  RecordVoicemailCommandSchema,
+  CollectDTMFCommandSchema,
+];
+
+const getSchemaByCommand = (type: string): BaseCommandSchema | null => {
+  const schema = commandList.find((schema) => schema.type === type);
   if (schema) {
     return schema;
   } else {
@@ -165,5 +349,6 @@ export type {
   Dropdown,
   SchemaEdge,
   EditNodeData,
+  APIParam,
 };
-export { getSchemaByCommand, RestAPICommandSchema };
+export { getSchemaByCommand, RestAPICommandSchema, commandList };

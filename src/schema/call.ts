@@ -2,6 +2,7 @@ import { BaseCommandSchema } from "./generic";
 
 const CallTransferCommandSchema: BaseCommandSchema = {
   command: "TransferCommand",
+  type: "TRANSFER_COMMAND",
   fields: {
     transferType: {
       key: "transferType",
@@ -18,8 +19,8 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       name: "Agent ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "/api/agents",
-      expression: "",
+      apiPath: "http://localhost:8080/api/agents",
+      expression: "$",
       condition: {
         field: "transferType",
         type: "equals",
@@ -30,9 +31,14 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       key: "queueId",
       name: "Queue ID",
       type: "dropdown",
-      apiPath: "/api/queues",
+      apiPath: "http://localhost:8080/public/queue",
       valueType: "api",
-      expression: "",
+      expression: `$map($, function($v) {
+                  {
+                    "id": $v.queueId,
+                    "label": $v.queueName
+                  }
+                })`,
       condition: {
         field: "transferType",
         type: "equals",
@@ -44,19 +50,34 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       name: "Timeout",
       type: "number",
     },
-    ringingAudioList: {
-      key: "ringingAudioList",
-      name: "Ringing Audio List",
+    mediaList: {
+      key: "mediaList",
+      name: "Media List",
       type: "array",
-      itemType: "dropdown",
-      items: {
-        key: "mediaFile",
-        name: "Media File",
-        type: "dropdown",
-        valueType: "api",
-        apiPath: "/api/audio",
-        expression: "",
-      },
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
     },
   },
   edges: {
@@ -73,40 +94,36 @@ const CallTransferCommandSchema: BaseCommandSchema = {
 
 const PlayMediaCommandSchema: BaseCommandSchema = {
   command: "PlayMediaCommand",
+  type: "PLAY_MEDIA",
   fields: {
-    isInterruptible: {
-      key: "isInterruptible",
-      name: "Is Interruptible",
-      type: "boolean",
-    },
-    repeatCount: {
-      key: "repeatCount",
-      name: "Repeat Count",
-      type: "number",
-    },
-    offsetMillis: {
-      key: "offsetMillis",
-      name: "Offset Millis",
-      type: "number",
-    },
-    skipMillis: {
-      key: "skipMillis",
-      name: "Skip Millis",
-      type: "number",
-    },
     mediaList: {
       key: "mediaList",
       name: "Media List",
       type: "array",
-      itemType: "dropdown",
-      items: {
-        key: "mediaFile",
-        name: "Media File",
-        type: "dropdown",
-        valueType: "api",
-        apiPath: "/api/audio",
-        expression: "",
-      },
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
     },
   },
   edges: {
@@ -114,11 +131,303 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
       name: "onSuccess",
       color: "#00FF00",
     },
-    onFailure: {
-      name: "onFailure",
-      color: "#FF0000",
+  },
+};
+
+const HangupCommandSchema: BaseCommandSchema = {
+  command: "HangupCommand",
+  type: "HANGUP",
+  fields: {
+    reason: {
+      key: "reason",
+      name: "Reason",
+      type: "string",
     },
   },
 };
 
-export { CallTransferCommandSchema, PlayMediaCommandSchema };
+const MenuCommandSchema: BaseCommandSchema = {
+  command: "MenuCommand",
+  type: "IVR_MENU",
+  fields: {
+    infoMedia: {
+      key: "infoMedia",
+      name: "Info Media",
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Info Media",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
+    },
+    idleTimeout: {
+      key: "idleTimeout",
+      name: "Idle Timeout",
+      type: "number",
+    },
+    idleTimeoutTolerance: {
+      key: "idleTimeoutTolerance",
+      name: "Idle Timeout Tolerance",
+      type: "number",
+    },
+    idleTimeoutWarningMedia: {
+      key: "idleTimeoutWarningMedia",
+      name: "Idle Timeout Warning",
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
+    },
+    incorrectDTMFTolerance: {
+      key: "incorrectDTMFTolerance",
+      name: "Incorrect DTMF Tolerance",
+      type: "number",
+    },
+    incorrectDTMFWarningMedia: {
+      key: "incorrectDTMFWarningMedia",
+      name: "Incorrect DTMF Warning",
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
+    },
+  },
+  edges: {
+    onDTMF_0: {
+      name: "onDTMF_0",
+      color: "black",
+    },
+    onDTMF_1: {
+      name: "onDTMF_1",
+      color: "black",
+    },
+    onDTMF_2: {
+      name: "onDTMF_2",
+      color: "black",
+    },
+    onDTMF_3: {
+      name: "onDTMF_3",
+      color: "black",
+    },
+    onDTMF_4: {
+      name: "onDTMF_4",
+      color: "black",
+    },
+    onDTMF_5: {
+      name: "onDTMF_5",
+      color: "black",
+    },
+    onDTMF_6: {
+      name: "onDTMF_6",
+      color: "black",
+    },
+    onDTMF_7: {
+      name: "onDTMF_7",
+      color: "black",
+    },
+    onDTMF_8: {
+      name: "onDTMF_8",
+      color: "black",
+    },
+    onDTMF_9: {
+      name: "onDTMF_9",
+      color: "black",
+    },
+    onDTMF_AST: {
+      name: "onDTMF_*",
+      color: "black",
+    },
+    onDTMF_HASH: {
+      name: "onDTMF_#",
+      color: "black",
+    },
+    onIncorrectDTMF: {
+      name: "onIncorrectDTMF",
+      color: "red",
+    },
+    onTimeout: {
+      name: "onTimeout",
+      color: "red",
+    },
+  },
+};
+
+const RecordVoicemailCommandSchema: BaseCommandSchema = {
+  command: "RecordVoicemailCommand",
+  type: "RECORD_VOICEMAIL",
+  fields: {
+    maxDuration: {
+      key: "maxDuration",
+      name: "Max Duration",
+      type: "number",
+    },
+    terminationDTMF: {
+      key: "terminationDTMF",
+      name: "Termination DTMF",
+      type: "dropdown",
+      valueType: "static",
+      values: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "0": "0",
+        "*": "*",
+        "#": "#",
+      },
+    },
+    mediaList: {
+      key: "mediaList",
+      name: "Media List",
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "mediaId",
+          name: "Media File",
+          type: "dropdown",
+          valueType: "api",
+          apiPath: "http://localhost:8080/public/media",
+          expression: `$.{
+                      "id": mediaId,
+                      "label": mediaName
+                    }`,
+        },
+        {
+          key: "offsetMillis",
+          name: "Offset Millis",
+          type: "number",
+        },
+        {
+          key: "skipMillis",
+          name: "Skip Millis",
+          type: "number",
+        },
+      ],
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#00FF00",
+    },
+  },
+};
+
+const CollectDTMFCommandSchema: BaseCommandSchema = {
+  command: "CollectDTMFCommand",
+  type: "COLLECT_DTMF",
+  fields: {
+    delimiter: {
+      key: "delimiter",
+      name: "Delimiter",
+      type: "dropdown",
+      valueType: "static",
+      values: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "0": "0",
+        "*": "*",
+        "#": "#",
+      },
+    },
+    length: {
+      key: "length",
+      name: "Length",
+      type: "number",
+    },
+    contextVariableName: {
+      key: "contextVariableName",
+      name: "Context Variable Name",
+      type: "string",
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#00FF00",
+    },
+  },
+};
+
+export {
+  CallTransferCommandSchema,
+  PlayMediaCommandSchema,
+  HangupCommandSchema,
+  MenuCommandSchema,
+  RecordVoicemailCommandSchema,
+  CollectDTMFCommandSchema,
+};
