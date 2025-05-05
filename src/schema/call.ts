@@ -360,10 +360,54 @@ const RecordVoicemailCommandSchema: BaseCommandSchema = {
   },
 };
 
+const CollectDTMFCommandSchema: BaseCommandSchema = {
+  command: "CollectDTMFCommand",
+  type: "COLLECT_DTMF",
+  fields: {
+    delimiter: {
+      key: "delimiter",
+      name: "Delimiter",
+      type: "dropdown",
+      valueType: "static",
+      values: {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "0": "0",
+        "*": "*",
+        "#": "#",
+      },
+    },
+    length: {
+      key: "length",
+      name: "Length",
+      type: "number",
+    },
+    contextVariableName: {
+      key: "contextVariableName",
+      name: "Context Variable Name",
+      type: "string",
+    },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#00FF00",
+    },
+  },
+};
+
 export {
   CallTransferCommandSchema,
   PlayMediaCommandSchema,
   HangupCommandSchema,
   MenuCommandSchema,
   RecordVoicemailCommandSchema,
+  CollectDTMFCommandSchema,
 };
