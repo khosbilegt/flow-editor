@@ -53,7 +53,7 @@ function FlowData({
   }, [editData]);
 
   return (
-    <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+    <Form labelCol={{ span: 10 }} wrapperCol={{ span: 18 }}>
       <Form.Item label="Name">
         <Input
           placeholder={"Name"}

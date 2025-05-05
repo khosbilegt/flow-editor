@@ -2,6 +2,7 @@ import { FlowValidationError } from "./architect";
 import {
   CallTransferCommandSchema,
   HangupCommandSchema,
+  MenuCommandSchema,
   PlayMediaCommandSchema,
 } from "./call";
 
@@ -322,6 +323,7 @@ const commandList: BaseCommandSchema[] = [
   JumpCommandSchema,
   SendMessageCommandSchema,
   SetVariableCommandSchema,
+  MenuCommandSchema,
 ];
 
 const getSchemaByCommand = (type: string): BaseCommandSchema | null => {
