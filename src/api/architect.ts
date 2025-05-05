@@ -189,6 +189,22 @@ export const architectAPI = createApi({
         return ["VersionList"];
       },
     }),
+    deployFlowVersion: build.mutation<
+      any,
+      {
+        flowId: number;
+        version: string;
+      }
+    >({
+      query: (data) => ({
+        url: `/flow/${data.flowId}/deploy`,
+        method: "PUT",
+        body: data?.version ? data?.version : "",
+      }),
+      invalidatesTags: (_) => {
+        return ["Flow", "VersionList"];
+      },
+    }),
   }),
 });
 
@@ -201,4 +217,5 @@ export const {
   useUpdateFlowHandlerMutation,
   useDeleteFlowHandlerMutation,
   useCloneFlowVersionMutation,
+  useDeployFlowVersionMutation,
 } = architectAPI;

@@ -26,6 +26,7 @@ import {
   useCloneFlowVersionMutation,
   useCreateFlowHandlerMutation,
   useDeleteFlowHandlerMutation,
+  useDeployFlowVersionMutation,
   useGetFlowByIdQuery,
   useGetFlowHandlerByIdQuery,
   useListFlowHandlersQuery,
@@ -84,6 +85,8 @@ function EditorLayout() {
   });
 
   const [cloneFlowVersion] = useCloneFlowVersionMutation();
+
+  const [deployFlowVersion] = useDeployFlowVersionMutation();
 
   const save = () => {
     if (selectedHandlerRef.current) {
@@ -206,7 +209,21 @@ function EditorLayout() {
           </Title>
         </Flex>
         <Flex align="center" gap={10}>
-          <Button danger>Deploy</Button>
+          <Popconfirm
+            title="Are you sure you want to deploy this version?"
+            onConfirm={() => {
+              deployFlowVersion({
+                flowId: flowIdRef.current,
+                version: selectedVersion,
+              })
+                .unwrap()
+                .then((res) => {
+                  console.log("Deploy successful", res);
+                });
+            }}
+          >
+            <Button danger>Deploy</Button>
+          </Popconfirm>
         </Flex>
       </Header>
       <Layout style={{ padding: "15px" }}>
