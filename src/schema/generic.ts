@@ -61,6 +61,7 @@ type Field =
       expression?: string;
       params?: APIParam[];
       values?: Record<string, string>;
+      items?: Field;
     }
   | Dropdown
   | {
@@ -96,6 +97,7 @@ type Field =
       expression?: string;
       params?: APIParam[];
       values?: Record<string, string>;
+      items?: Field;
     };
 
 interface BaseCommandSchema {
@@ -118,15 +120,15 @@ const RestAPICommandSchema: BaseCommandSchema = {
   command: "APICallCommand",
   type: "API_CALL",
   fields: {
-    dataObjectId: {
+    restClientId: {
       key: "restClientId",
       name: "Rest Client ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "http://localhost:8080/public/media",
+      apiPath: "http://localhost:8080/public/client",
       expression: `$.{
-                      "id": mediaId,
-                      "label": mediaName
+                      "id": restClientId,
+                      "label": restClientName
                     }`,
     },
     method: {
@@ -185,6 +187,25 @@ const RestAPICommandSchema: BaseCommandSchema = {
       name: "Timeout",
       type: "number",
     },
+    dataObjects: {
+      key: "dataObjects",
+      name: "Data Objects",
+      type: "array",
+      itemType: "dropdown",
+      items: {
+        key: "dataObject",
+        name: "Data Object",
+        type: "dropdown",
+        valueType: "api",
+        apiPath: "http://localhost:8080/public/data-object",
+        expression: `$map($, function($v) {
+                  {
+                    "id": $v.objectId,
+                    "label": $v.objectName
+                  }
+                })`,
+      },
+    },
     responseCodeContextParams: {
       key: "responseCodeContextParams",
       name: "Response Edges",
@@ -240,15 +261,14 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
         key: "dataObject",
         name: "Data Object",
         type: "dropdown",
-        valueType: "static",
-        values: {
-          GET: "GET",
-          POST: "POST",
-          PUT: "PUT",
-          DELETE: "DELETE",
-          PATCH: "PATCH",
-        },
-        expression: "",
+        valueType: "api",
+        apiPath: "http://localhost:8080/public/data-object",
+        expression: `$map($, function($v) {
+                  {
+                    "id": $v.objectId,
+                    "label": $v.objectName
+                  }
+                })`,
       },
     },
   },

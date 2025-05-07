@@ -69,14 +69,13 @@ function ArrayField({
               return (
                 <DropdownField
                   key={index}
-                  field={itemFields[index]}
+                  field={itemFields[0]}
                   value={item}
                   setValue={(value) => {
                     const newItems = [...items];
                     newItems[index] = value;
                     setItems(newItems);
                   }}
-                  // dropdownValues={{ key1: "value1", key2: "value2" }}
                   error={error}
                 />
               );

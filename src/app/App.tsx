@@ -145,21 +145,6 @@ function App({
             }
             console.log(key, fieldSchema, fieldValue);
           }
-          // formattedCommand[key] = command.fields[key];
-          // if (typeof fieldValue === "object" && fieldValue !== null) {
-          //   if (Array.isArray(fieldValue)) {
-          //     formattedCommand[key] = fieldValue;
-          //   } else {
-          //     formattedCommand[key] = Object.entries(fieldValue).map(
-          //       ([k, v]) => ({
-          //         key: k,
-          //         expression: v,
-          //       })
-          //     );
-          //   }
-          // } else {
-          //   formattedCommand[key] = fieldValue;
-          // }
         });
         delete formattedCommand.fields;
         Object.keys(formattedCommand.edges).forEach((key: string) => {

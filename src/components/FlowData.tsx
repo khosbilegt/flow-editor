@@ -1,4 +1,4 @@
-import { EditNodeData } from "@/schema/generic";
+import { EditNodeData, Field } from "@/schema/generic";
 import { Alert, Button, Flex, Form, Input, Typography } from "antd";
 import { useEffect, useState } from "react";
 import BooleanField from "./data/BooleanField";
@@ -173,7 +173,13 @@ function FlowData({
                       : []
                   }
                   itemType={field?.itemType ? field?.itemType : ""}
-                  itemFields={field?.fields ? field?.fields : []}
+                  itemFields={
+                    field?.itemType === "dropdown"
+                      ? [field?.items].filter((item): item is Field => !!item)
+                      : field?.fields
+                      ? field?.fields.filter((item): item is Field => !!item)
+                      : []
+                  }
                   setItems={(items) => {
                     setLocalData({
                       ...localData,
