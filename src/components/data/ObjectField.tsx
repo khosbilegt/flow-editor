@@ -70,7 +70,9 @@ function ObjectField({
               return (
                 <MapField
                   key={index}
+                  keyType={field.keyType ? field.keyType : "string"}
                   itemType={field?.itemType ? field?.itemType : ""}
+                  itemFields={field?.fields ? field?.fields : []}
                   object={object[field.key]}
                   setObject={(value) => {
                     setObject({

@@ -151,7 +151,9 @@ function FlowData({
               {field.type === "map" && (
                 <MapField
                   object={localData[field.key] ? localData[field.key] : {}}
+                  keyType={field.keyType ? field.keyType : "string"}
                   itemType={field?.itemType ? field?.itemType : ""}
+                  itemFields={field?.fields ? field?.fields : []}
                   setObject={(object) => {
                     setLocalData({
                       ...localData,

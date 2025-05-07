@@ -4,7 +4,7 @@ import App from "./App";
 function AppWrapper() {
   const [flowId, setFlowId] = useState(1);
   const [version, setVersion] = useState("");
-  const [handlerId, setHandlerId] = useState("defaultHandler");
+  const [handlerId, setHandlerId] = useState("MAIN");
 
   const navigateTo = (flowId: number, version: string, handlerId: string) => {
     const path = `/${flowId}/${version}/${handlerId}`;

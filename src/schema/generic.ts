@@ -43,6 +43,7 @@ type Field =
   | {
       key: string;
       name: string;
+      keyType?: "string" | "number";
       itemType?:
         | "string"
         | "number"
@@ -74,6 +75,7 @@ type Field =
         | "array"
         | "dropdown"
         | "object";
+      keyType?: "string" | "number";
       items: Field;
       fields: Field[];
       condition?: Condition;
@@ -127,7 +129,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
                       "label": mediaName
                     }`,
     },
-    type: {
+    method: {
       key: "method",
       name: "HTTP Method",
       type: "dropdown",
@@ -177,6 +179,30 @@ const RestAPICommandSchema: BaseCommandSchema = {
       key: "body",
       name: "Body",
       type: "text",
+    },
+    timeout: {
+      key: "timeout",
+      name: "Timeout",
+      type: "number",
+    },
+    responseCodeContextParams: {
+      key: "responseCodeContextParams",
+      name: "Response Edges",
+      type: "map",
+      itemType: "object",
+      keyType: "number",
+      fields: [
+        {
+          key: "key",
+          name: "Key",
+          type: "string",
+        },
+        {
+          key: "expression",
+          name: "Expression",
+          type: "string",
+        },
+      ],
     },
   },
   edges: {

@@ -1,17 +1,24 @@
 import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
-import { Button, Flex, Input } from "antd";
+import { Button, Flex, Input, InputNumber } from "antd";
 import StringField from "./StringField";
 import NumberField from "./NumberField";
 import BooleanField from "./BooleanField";
 import { FlowValidationError } from "@/schema/architect";
+import ObjectField from "./ObjectField";
+import { Field } from "@/schema/generic";
+import ArrayField from "./ArrayField";
 
 function MapField({
+  keyType,
   itemType,
+  itemFields,
   object,
   setObject,
   error,
 }: {
+  keyType: "string" | "number";
   itemType: string;
+  itemFields: Field[];
   object: any;
   setObject: (object: any) => void;
   error?: FlowValidationError | null | undefined;
@@ -71,6 +78,8 @@ function MapField({
                 <MapField
                   key={index}
                   itemType={itemType}
+                  keyType={keyType}
+                  itemFields={itemFields}
                   object={object[key]}
                   setObject={(value) => {
                     setObject({
@@ -84,11 +93,12 @@ function MapField({
             }
             case "array": {
               return (
-                <MapField
+                <ArrayField
                   key={index}
                   itemType={itemType}
-                  object={object[key]}
-                  setObject={(value) => {
+                  itemFields={itemFields}
+                  items={object[key]}
+                  setItems={(value) => {
                     setObject({
                       ...object,
                       [key]: value,
@@ -111,21 +121,57 @@ function MapField({
                 />
               );
             }
+            case "object": {
+              return (
+                <ObjectField
+                  key={index}
+                  fields={itemFields}
+                  object={object[key]}
+                  setObject={(e) => {
+                    console.log(e);
+                    setObject({
+                      ...object,
+                      [key]: {
+                        ...object[key],
+                        ...e,
+                      },
+                    });
+                  }}
+                  error={error}
+                />
+              );
+            }
           }
           return <></>;
         };
         return (
           <Flex gap={5} key={index}>
-            <Input
-              placeholder="Key"
-              value={key}
-              onChange={(e) => {
-                const newObject = { ...object };
-                newObject[e.target.value] = newObject[key];
-                delete newObject[key];
-                setObject(newObject);
-              }}
-            />
+            {keyType === "number" ? (
+              <InputNumber
+                placeholder="Key"
+                value={key}
+                onChange={(e) => {
+                  const newObject = { ...object };
+                  if (e) {
+                    newObject[parseInt(e)] = newObject[key];
+                    delete newObject[key];
+                    setObject(newObject);
+                  }
+                }}
+              />
+            ) : (
+              <Input
+                placeholder="Key"
+                value={key}
+                onChange={(e) => {
+                  const newObject = { ...object };
+                  newObject[e.target.value] = newObject[key];
+                  delete newObject[key];
+                  setObject(newObject);
+                }}
+              />
+            )}
+
             {renderField()}
             <Button
               danger
@@ -145,7 +191,12 @@ function MapField({
         type="primary"
         icon={<PlusCircleOutlined />}
         onClick={() => {
-          const newKey = `newKey${Object.keys(object).length}`;
+          let newKey: any = "";
+          if (keyType === "number") {
+            newKey = 0;
+          } else {
+            newKey = `newKey${Object.keys(object).length}`;
+          }
           setObject({
             ...object,
             [newKey]: "",

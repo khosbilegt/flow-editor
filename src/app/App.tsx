@@ -41,6 +41,7 @@ import {
   setSelectedVersion,
 } from "../context/FlowContext";
 import { RootState } from "./store";
+import { getSchemaByCommand } from "../schema/generic";
 
 const { Search } = Input;
 
@@ -120,23 +121,45 @@ function App({
       const commandMap: Record<string, FlowCommand> = {};
       commandsRef.current.forEach((command: FlowCommand) => {
         let formattedCommand: any = { ...command };
+        const commandSchema = getSchemaByCommand(command.type);
+        console.log("Saving: ", commandSchema);
         Object.keys(formattedCommand.fields).forEach((key: string) => {
           const fieldValue = command.fields[key];
-          formattedCommand[key] = command.fields[key];
-          if (typeof fieldValue === "object" && fieldValue !== null) {
-            if (Array.isArray(fieldValue)) {
-              formattedCommand[key] = fieldValue;
-            } else {
-              formattedCommand[key] = Object.entries(fieldValue).map(
-                ([k, v]) => ({
-                  key: k,
-                  expression: v,
-                })
-              );
+          if (commandSchema) {
+            const fieldSchema = commandSchema.fields[key];
+            if (fieldSchema) {
+              if (fieldSchema.type === "array") {
+                if (Array.isArray(fieldValue)) {
+                  formattedCommand[key] = fieldValue;
+                } else {
+                  formattedCommand[key] = Object.entries(fieldValue).map(
+                    ([k, v]) => ({
+                      key: k,
+                      expression: v,
+                    })
+                  );
+                }
+              } else {
+                formattedCommand[key] = fieldValue;
+              }
             }
-          } else {
-            formattedCommand[key] = fieldValue;
+            console.log(key, fieldSchema, fieldValue);
           }
+          // formattedCommand[key] = command.fields[key];
+          // if (typeof fieldValue === "object" && fieldValue !== null) {
+          //   if (Array.isArray(fieldValue)) {
+          //     formattedCommand[key] = fieldValue;
+          //   } else {
+          //     formattedCommand[key] = Object.entries(fieldValue).map(
+          //       ([k, v]) => ({
+          //         key: k,
+          //         expression: v,
+          //       })
+          //     );
+          //   }
+          // } else {
+          //   formattedCommand[key] = fieldValue;
+          // }
         });
         delete formattedCommand.fields;
         Object.keys(formattedCommand.edges).forEach((key: string) => {
@@ -151,6 +174,7 @@ function App({
         ...selectedHandlerRef.current,
         commands: commandMap,
       };
+      console.log(commandMap);
       updateFlowHandler({
         flowId: flowIdRef.current,
         data: updatedDefinition,
