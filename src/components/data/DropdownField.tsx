@@ -26,7 +26,7 @@ function DropdownField({
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${flowState.accessToken}`,
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
     })
       .then((res) => res.json())
