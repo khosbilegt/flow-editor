@@ -122,7 +122,7 @@ function App({
       commandsRef.current.forEach((command: FlowCommand) => {
         let formattedCommand: any = { ...command };
         const commandSchema = getSchemaByCommand(command.type);
-        console.log("Saving: ", commandSchema);
+        formattedCommand.actionCounter = command.fields?.actionCounter;
         Object.keys(formattedCommand.fields).forEach((key: string) => {
           const fieldValue = command.fields[key];
           if (commandSchema) {
@@ -137,14 +137,17 @@ function App({
           }
         });
         delete formattedCommand.fields;
+
         Object.keys(formattedCommand.edges).forEach((key: string) => {
           if (command?.edges && command?.edges[key]) {
             formattedCommand[key] = command?.edges[key].target;
           }
         });
+
         commandMap[command.id] = formattedCommand;
         delete commandMap[command.id].edges;
       });
+      console.log("Updated", commandMap);
       let updatedDefinition: FlowHandler = {
         ...selectedHandlerRef.current,
         commands: commandMap,

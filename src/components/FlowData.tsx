@@ -61,6 +61,18 @@ function FlowData({
           onChange={(e) => setLocalName(e.target.value)}
         />
       </Form.Item>
+      <Form.Item label="Action Counters">
+        <Input
+          placeholder={"Action Counters"}
+          value={localData?.actionCounter}
+          onChange={(e) => {
+            setLocalData({
+              ...localData,
+              actionCounter: e.target.value,
+            });
+          }}
+        />
+      </Form.Item>
       {editData?.schema?.fields &&
         Object.entries(editData.schema.fields).map(([key, field]) => {
           if (field.condition) {

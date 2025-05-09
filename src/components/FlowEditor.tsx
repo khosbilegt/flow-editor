@@ -131,15 +131,17 @@ function FlowEditor({
     setName: (name: string) => void
   ) => {
     const tempCommand = commands.find((command) => command.id === id);
-    setEditData({
-      id: id,
-      schema: schema,
-      name: name,
-      setName: setName,
-      data: tempCommand?.fields,
-      errors: tempCommand?.errors ? tempCommand?.errors : [],
-    });
-    setEditCommandDrawerOpen(true);
+    if (tempCommand) {
+      setEditData({
+        id: id,
+        schema: schema,
+        name: name,
+        setName: setName,
+        data: tempCommand?.fields,
+        errors: tempCommand?.errors ? tempCommand?.errors : [],
+      });
+      setEditCommandDrawerOpen(true);
+    }
   };
 
   const handleCreateSubmit = (schema: BaseCommandSchema) => {
