@@ -8,7 +8,6 @@ function AppWrapper() {
 
   const navigateTo = (flowId: number, version: string, handlerId: string) => {
     const path = `/${flowId}/${version}/${handlerId}`;
-    console.log("Path", path);
     window.history.replaceState({}, "", path);
     setFlowId(flowId);
     setVersion(version);

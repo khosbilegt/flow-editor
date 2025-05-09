@@ -121,7 +121,6 @@ function ArrayField({
         type="primary"
         icon={<PlusCircleOutlined />}
         onClick={() => {
-          console.log(items);
           const newItems = [...items, ""];
           setItems(newItems);
         }}

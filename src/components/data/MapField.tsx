@@ -95,8 +95,6 @@ function MapField({
               );
             }
             case "array": {
-              console.log(object);
-              console.log(items);
               return (
                 <ArrayField
                   key={index}
@@ -133,7 +131,6 @@ function MapField({
                   fields={itemFields}
                   object={object[key]}
                   setObject={(e) => {
-                    console.log(e);
                     setObject({
                       ...object,
                       [key]: {

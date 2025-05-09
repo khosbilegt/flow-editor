@@ -96,7 +96,6 @@ export const architectAPI = createApi({
             });
             command["fields"] = fields;
             command["edges"] = edges;
-            console.log("After", command);
             tempCommands.push(command);
           }
         );

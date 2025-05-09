@@ -50,7 +50,6 @@ function FlowData({
       });
     }
     setLocalErrors(tempErrors);
-    console.log(editData);
   }, [editData]);
 
   return (
@@ -193,9 +192,14 @@ function FlowData({
               )}
               {field.type === "object" && (
                 <ObjectField
-                  object={{}}
-                  setObject={() => {}}
-                  fields={[]}
+                  object={localData[field.key] ? localData[field.key] : {}}
+                  setObject={(object) => {
+                    setLocalData({
+                      ...localData,
+                      [field.key]: object,
+                    });
+                  }}
+                  fields={field.fields}
                   error={localErrors[field.key]}
                 />
               )}

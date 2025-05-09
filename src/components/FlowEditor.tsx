@@ -292,7 +292,6 @@ function FlowEditor({
           updatedCommands.push(command);
         }
       });
-      console.log("Here", edgeConnectParams);
       setCommands(updatedCommands);
     }
   }, [edgeConnectParams]);

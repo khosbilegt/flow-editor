@@ -134,7 +134,6 @@ function App({
                 formattedCommand[key] = fieldValue;
               }
             }
-            console.log(key, fieldSchema, fieldValue);
           }
         });
         delete formattedCommand.fields;
@@ -150,7 +149,6 @@ function App({
         ...selectedHandlerRef.current,
         commands: commandMap,
       };
-      console.log(commandMap);
       updateFlowHandler({
         flowId: flowIdRef.current,
         data: updatedDefinition,
