@@ -121,8 +121,26 @@ function ArrayField({
         type="primary"
         icon={<PlusCircleOutlined />}
         onClick={() => {
-          const newItems = [...items, ""];
-          setItems(newItems);
+          if (itemType === "string") {
+            setItems([...items, ""]);
+            return;
+          }
+          if (itemType === "dropdown") {
+            setItems([...items, itemFields[0].values ? "" : {}]);
+            return;
+          }
+          if (itemType === "number") {
+            setItems([...items, 0]);
+            return;
+          }
+          if (itemType === "boolean") {
+            setItems([...items, false]);
+            return;
+          }
+          if (itemType === "object") {
+            setItems([...items, {}]);
+            return;
+          }
         }}
       >
         Add Field

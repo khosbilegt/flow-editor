@@ -191,6 +191,24 @@ const RestAPICommandSchema: BaseCommandSchema = {
         },
       ],
     },
+    bodyParams: {
+      key: "bodyParams",
+      name: "Body Parameters",
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "key",
+          name: "Key",
+          type: "string",
+        },
+        {
+          key: "expression",
+          name: "Value",
+          type: "string",
+        },
+      ],
+    },
     body: {
       key: "body",
       name: "Body",
@@ -220,69 +238,32 @@ const RestAPICommandSchema: BaseCommandSchema = {
                 })`,
       },
     },
-    responseCodeContextParams: {
-      key: "responseCodeContextParams",
-      name: "Variables",
-      type: "array",
+    responseHandler: {
+      key: "responseHandler",
+      name: "Response Handlers",
+      type: "map",
+      keyType: "number",
       itemType: "object",
       fields: [
         {
-          key: "responseCode",
-          name: "Response Code",
-          type: "number",
-        },
-        {
-          key: "key",
-          name: "Name",
-          type: "string",
-        },
-        {
-          key: "expression",
-          name: "Expression",
-          type: "string",
+          key: "variables",
+          name: "Variables",
+          type: "array",
+          itemType: "object",
+          fields: [
+            {
+              key: "key",
+              name: "Key",
+              type: "string",
+            },
+            {
+              key: "expression",
+              name: "Value",
+              type: "string",
+            },
+          ],
         },
       ],
-      // type: "map",
-      // itemType: "array",
-      // items: {
-      //   key: "responseCodeContextParam",
-      //   name: "Response Code Context Param",
-      //   type: "array",
-      //   itemType: "object",
-      //   fields: [
-      //     {
-      //       key: "variableName",
-      //       name: "Name",
-      //       type: "string",
-      //     },
-      //     {
-      //       key: "variableValue",
-      //       name: "Expression",
-      //       type: "string",
-      //     },
-      //   ],
-      // },
-      // keyType: "number",
-      // fields: [
-      //   {
-      //     key: "variables",
-      //     name: "Variables",
-      //     type: "array",
-      //     itemType: "object",
-      //     fields: [
-      //       {
-      //         key: "variableName",
-      //         name: "Name",
-      //         type: "string",
-      //       },
-      //       {
-      //         key: "variableValue",
-      //         name: "Expression",
-      //         type: "string",
-      //       },
-      //     ],
-      //   },
-      // ],
     },
   },
   edges: {

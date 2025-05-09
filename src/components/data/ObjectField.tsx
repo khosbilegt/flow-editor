@@ -88,7 +88,7 @@ function ObjectField({
               return (
                 <ArrayField
                   key={index}
-                  items={object[field.key]}
+                  items={object[field.key] ? object[field.key] : []}
                   setItems={(value) => {
                     setObject({
                       ...object,

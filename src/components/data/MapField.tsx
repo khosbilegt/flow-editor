@@ -146,6 +146,43 @@ function MapField({
           }
           return <></>;
         };
+        if (
+          itemType === "array" ||
+          itemType === "object" ||
+          itemType === "map"
+        ) {
+          return (
+            <Flex gap={5} key={index} vertical>
+              {keyType === "number" ? (
+                <InputNumber
+                  placeholder="Key"
+                  value={key}
+                  style={{ width: "100%" }}
+                  onChange={(e) => {
+                    const newObject = { ...object };
+                    if (e) {
+                      newObject[parseInt(e)] = newObject[key];
+                      delete newObject[key];
+                      setObject(newObject);
+                    }
+                  }}
+                />
+              ) : (
+                <Input
+                  placeholder="Key"
+                  value={key}
+                  onChange={(e) => {
+                    const newObject = { ...object };
+                    newObject[e.target.value] = newObject[key];
+                    delete newObject[key];
+                    setObject(newObject);
+                  }}
+                />
+              )}
+              {renderField()}
+            </Flex>
+          );
+        }
         return (
           <Flex gap={5} key={index}>
             {keyType === "number" ? (
@@ -173,7 +210,6 @@ function MapField({
                 }}
               />
             )}
-
             {renderField()}
             <Button
               danger

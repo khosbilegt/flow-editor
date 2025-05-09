@@ -26,6 +26,7 @@ function DropdownField({
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${flowState.accessToken}`,
       },
     })
       .then((res) => res.json())
@@ -100,6 +101,7 @@ function DropdownField({
       value={value}
       onChange={setValue}
       status={error !== null && error !== undefined ? "error" : undefined}
+      style={{ width: "100%", minWidth: "150px" }}
     >
       {dropdownValues?.map((item: any) => {
         return (
