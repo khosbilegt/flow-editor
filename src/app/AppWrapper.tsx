@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import App from "./App";
+import AuthProvider from "./AuthProvider";
+import AuthConfig from "../api/AuthConfig.json";
+
+const authEnv: keyof typeof AuthConfig = import.meta.env
+  .VITE_REACT_APP_AUTH_CONFIG as keyof typeof AuthConfig;
 
 function AppWrapper() {
   const [flowId, setFlowId] = useState(1);
@@ -32,12 +37,14 @@ function AppWrapper() {
   }, []);
 
   return (
-    <App
-      flowId={flowId}
-      initialVersion={version}
-      initialHandlerId={handlerId}
-      navigateTo={navigateTo}
-    />
+    <AuthProvider config={AuthConfig[authEnv]}>
+      <App
+        flowId={flowId}
+        initialVersion={version}
+        initialHandlerId={handlerId}
+        navigateTo={navigateTo}
+      />
+    </AuthProvider>
   );
 }
 

@@ -5,12 +5,20 @@ import {
   FlowCommand,
   FlowHandler,
 } from "@/schema/architect";
+const url = import.meta.env.VITE_REACT_APP_ARCHITECT_API_URL;
 
 export const architectAPI = createApi({
   reducerPath: "architectAPI",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8080/public",
-    // baseUrl: "https://api-dev-cec.unitel.mn:8000/architect/v2/public",
+    baseUrl: `${url}/public`,
+    prepareHeaders: (headers) => {
+      headers.set("Content-Type", "application/json");
+      headers.set(
+        "Authorization",
+        `Bearer ${localStorage.getItem("access_token")}`
+      );
+      return headers;
+    },
   }),
   tagTypes: ["Flow", "FlowHandler", "FlowHandlerList", "VersionList"],
   endpoints: (build) => ({
