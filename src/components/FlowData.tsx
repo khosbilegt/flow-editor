@@ -50,6 +50,7 @@ function FlowData({
       });
     }
     setLocalErrors(tempErrors);
+    console.log(editData);
   }, [editData]);
 
   return (
@@ -153,6 +154,7 @@ function FlowData({
                   object={localData[field.key] ? localData[field.key] : {}}
                   keyType={field.keyType ? field.keyType : "string"}
                   itemType={field?.itemType ? field?.itemType : ""}
+                  items={field.items}
                   itemFields={field?.fields ? field?.fields : []}
                   setObject={(object) => {
                     setLocalData({

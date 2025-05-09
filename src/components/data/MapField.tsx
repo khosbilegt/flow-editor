@@ -12,6 +12,7 @@ function MapField({
   keyType,
   itemType,
   itemFields,
+  items,
   object,
   setObject,
   error,
@@ -19,6 +20,7 @@ function MapField({
   keyType: "string" | "number";
   itemType: string;
   itemFields: Field[];
+  items: Field | undefined;
   object: any;
   setObject: (object: any) => void;
   error?: FlowValidationError | null | undefined;
@@ -80,6 +82,7 @@ function MapField({
                   itemType={itemType}
                   keyType={keyType}
                   itemFields={itemFields}
+                  items={items}
                   object={object[key]}
                   setObject={(value) => {
                     setObject({
@@ -92,11 +95,13 @@ function MapField({
               );
             }
             case "array": {
+              console.log(object);
+              console.log(items);
               return (
                 <ArrayField
                   key={index}
-                  itemType={itemType}
-                  itemFields={itemFields}
+                  itemType={items?.type ? items?.type : ""}
+                  itemFields={[]}
                   items={object[key]}
                   setItems={(value) => {
                     setObject({
@@ -197,10 +202,17 @@ function MapField({
           } else {
             newKey = `newKey${Object.keys(object).length}`;
           }
-          setObject({
-            ...object,
-            [newKey]: "",
-          });
+          if (itemType === "array") {
+            setObject({
+              ...object,
+              [newKey]: [],
+            });
+          } else {
+            setObject({
+              ...object,
+              [newKey]: "",
+            });
+          }
         }}
       >
         Add Field

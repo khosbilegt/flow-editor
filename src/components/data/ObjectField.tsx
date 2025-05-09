@@ -73,6 +73,7 @@ function ObjectField({
                   keyType={field.keyType ? field.keyType : "string"}
                   itemType={field?.itemType ? field?.itemType : ""}
                   itemFields={field?.fields ? field?.fields : []}
+                  items={field.items}
                   object={object[field.key]}
                   setObject={(value) => {
                     setObject({
@@ -115,6 +116,7 @@ function ObjectField({
                   error={error}
                 />
               );
+
             default:
               return null;
           }

@@ -158,24 +158,38 @@ const RestAPICommandSchema: BaseCommandSchema = {
     queryParams: {
       key: "queryParams",
       name: "Query Parameters",
-      type: "map",
-      itemType: "string",
-      items: {
-        key: "queryParam",
-        name: "Query Parameter",
-        type: "string",
-      },
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "key",
+          name: "Key",
+          type: "string",
+        },
+        {
+          key: "expression",
+          name: "Value",
+          type: "string",
+        },
+      ],
     },
     pathParams: {
       key: "pathParams",
       name: "Path Parameters",
-      type: "map",
-      itemType: "number",
-      items: {
-        key: "pathParam",
-        name: "Path Parameter",
-        type: "string",
-      },
+      type: "array",
+      itemType: "object",
+      fields: [
+        {
+          key: "key",
+          name: "Key",
+          type: "string",
+        },
+        {
+          key: "expression",
+          name: "Value",
+          type: "string",
+        },
+      ],
     },
     body: {
       key: "body",
@@ -208,14 +222,18 @@ const RestAPICommandSchema: BaseCommandSchema = {
     },
     responseCodeContextParams: {
       key: "responseCodeContextParams",
-      name: "Response Edges",
-      type: "map",
+      name: "Variables",
+      type: "array",
       itemType: "object",
-      keyType: "number",
       fields: [
         {
+          key: "responseCode",
+          name: "Response Code",
+          type: "number",
+        },
+        {
           key: "key",
-          name: "Key",
+          name: "Name",
           type: "string",
         },
         {
@@ -224,6 +242,47 @@ const RestAPICommandSchema: BaseCommandSchema = {
           type: "string",
         },
       ],
+      // type: "map",
+      // itemType: "array",
+      // items: {
+      //   key: "responseCodeContextParam",
+      //   name: "Response Code Context Param",
+      //   type: "array",
+      //   itemType: "object",
+      //   fields: [
+      //     {
+      //       key: "variableName",
+      //       name: "Name",
+      //       type: "string",
+      //     },
+      //     {
+      //       key: "variableValue",
+      //       name: "Expression",
+      //       type: "string",
+      //     },
+      //   ],
+      // },
+      // keyType: "number",
+      // fields: [
+      //   {
+      //     key: "variables",
+      //     name: "Variables",
+      //     type: "array",
+      //     itemType: "object",
+      //     fields: [
+      //       {
+      //         key: "variableName",
+      //         name: "Name",
+      //         type: "string",
+      //       },
+      //       {
+      //         key: "variableValue",
+      //         name: "Expression",
+      //         type: "string",
+      //       },
+      //     ],
+      //   },
+      // ],
     },
   },
   edges: {

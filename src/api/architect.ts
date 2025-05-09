@@ -80,11 +80,7 @@ export const architectAPI = createApi({
                     let tempFieldMap: any = {};
                     let tempFieldArray: any[] = [];
                     command[fieldKey].forEach((item: any) => {
-                      if (item.key && item.expression) {
-                        tempFieldMap[item.key] = item.expression;
-                      } else {
-                        tempFieldArray.push(item);
-                      }
+                      tempFieldArray.push(item);
                     });
                     if (tempFieldArray.length > 0) {
                       fields[fieldKey] = tempFieldArray;
@@ -100,6 +96,7 @@ export const architectAPI = createApi({
             });
             command["fields"] = fields;
             command["edges"] = edges;
+            console.log("After", command);
             tempCommands.push(command);
           }
         );

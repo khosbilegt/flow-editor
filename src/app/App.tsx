@@ -129,16 +129,7 @@ function App({
             const fieldSchema = commandSchema.fields[key];
             if (fieldSchema) {
               if (fieldSchema.type === "array") {
-                if (Array.isArray(fieldValue)) {
-                  formattedCommand[key] = fieldValue;
-                } else {
-                  formattedCommand[key] = Object.entries(fieldValue).map(
-                    ([k, v]) => ({
-                      key: k,
-                      expression: v,
-                    })
-                  );
-                }
+                formattedCommand[key] = fieldValue;
               } else {
                 formattedCommand[key] = fieldValue;
               }

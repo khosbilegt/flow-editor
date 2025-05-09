@@ -101,7 +101,9 @@ function ArrayField({
         };
         return (
           <Flex gap={10} key={index}>
-            {renderField()}
+            <Flex gap={5} style={{ lineHeight: "32px" }}>
+              {index + 1}. {renderField()}
+            </Flex>
             <Button
               danger
               type="primary"
@@ -119,6 +121,7 @@ function ArrayField({
         type="primary"
         icon={<PlusCircleOutlined />}
         onClick={() => {
+          console.log(items);
           const newItems = [...items, ""];
           setItems(newItems);
         }}
