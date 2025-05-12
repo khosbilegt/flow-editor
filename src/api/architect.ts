@@ -5,21 +5,31 @@ import {
   FlowCommand,
   FlowHandler,
 } from "@/schema/architect";
+import { logout } from "../app/logout";
 const url = import.meta.env.VITE_REACT_APP_ARCHITECT_API_URL;
 
 export const architectAPI = createApi({
   reducerPath: "architectAPI",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${url}/public`,
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", "application/json");
-      headers.set(
-        "Authorization",
-        `Bearer ${localStorage.getItem("access_token")}`
-      );
-      return headers;
-    },
-  }),
+  baseQuery: async (args, api, extraArgument) => {
+    const baseQuery = fetchBaseQuery({
+      baseUrl: `${url}/public`,
+      prepareHeaders: (headers) => {
+        headers.set("Content-Type", "application/json");
+        headers.set(
+          "Authorization",
+          `Bearer ${localStorage.getItem("access_token")}`
+        );
+        return headers;
+      },
+    });
+    const result = await baseQuery(args, api, extraArgument);
+
+    if (result.error && result.error.status === 401) {
+      logout();
+    }
+
+    return result;
+  },
   tagTypes: ["Flow", "FlowHandler", "FlowHandlerList", "VersionList"],
   endpoints: (build) => ({
     getFlowById: build.query<Flow, number>({

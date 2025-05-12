@@ -10,7 +10,7 @@ export default defineConfig({
       name: "ContactX-Flow-Editor",
       filename: "remoteEntry.js",
       exposes: {
-        "./App": "./src/app/App",
+        "./App": "./src/app/MicroWrapper.tsx",
       },
       shared: ["react", "react-dom", "antd", "dayjs", "react-redux"],
     }),
