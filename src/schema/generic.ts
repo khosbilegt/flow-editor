@@ -125,7 +125,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
       name: "Rest Client ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "http://localhost:8080/public/client",
+      apiPath: "https://api-dev-cec.unitel.mn:8000/architect/v2/public/client",
       expression: `$.{
                       "id": restClientId,
                       "label": restClientName
@@ -229,7 +229,8 @@ const RestAPICommandSchema: BaseCommandSchema = {
         name: "Data Object",
         type: "dropdown",
         valueType: "api",
-        apiPath: "http://localhost:8080/public/data-object",
+        apiPath:
+          "https://api-dev-cec.unitel.mn:8000/architect/v2/public/data-object",
         expression: `$map($, function($v) {
                   {
                     "id": $v.objectId,
@@ -302,7 +303,8 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
         name: "Data Object",
         type: "dropdown",
         valueType: "api",
-        apiPath: "http://localhost:8080/public/data-object",
+        apiPath:
+          "https://api-dev-cec.unitel.mn:8000/architect/v2/public/data-object",
         expression: `$map($, function($v) {
                   {
                     "id": $v.objectId,
@@ -334,7 +336,7 @@ const JumpCommandSchema: BaseCommandSchema = {
       type: "dropdown",
       valueType: "api",
       apiPath:
-        "http://localhost:8080/public/flow/${flowId}/handler/list?version=${version}",
+        "https://api-dev-cec.unitel.mn:8000/architect/v2/public/flow/${flowId}/handler/list?version=${version}",
       params: [
         {
           key: "flowId",

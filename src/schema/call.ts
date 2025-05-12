@@ -19,7 +19,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       name: "Agent ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "http://localhost:8080/api/agents",
+      apiPath: "https://api-dev-cec.unitel.mn:8000/architect/v2/api/agents",
       expression: "$",
       condition: {
         field: "transferType",
@@ -31,7 +31,7 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       key: "queueId",
       name: "Queue ID",
       type: "dropdown",
-      apiPath: "http://localhost:8080/public/queue",
+      apiPath: "https://api-dev-cec.unitel.mn:8000/architect/v2/public/queue",
       valueType: "api",
       expression: `$map($, function($v) {
                   {
@@ -61,7 +61,8 @@ const CallTransferCommandSchema: BaseCommandSchema = {
           name: "Media File",
           type: "dropdown",
           valueType: "api",
-          apiPath: "http://localhost:8080/public/media",
+          apiPath:
+            "https://api-dev-cec.unitel.mn:8000/architect/v2/public/media",
           expression: `$.{
                       "id": mediaId,
                       "label": mediaName
@@ -107,7 +108,8 @@ const PlayMediaCommandSchema: BaseCommandSchema = {
           name: "Media File",
           type: "dropdown",
           valueType: "api",
-          apiPath: "http://localhost:8080/public/media",
+          apiPath:
+            "https://api-dev-cec.unitel.mn:8000/architect/v2/public/media",
           expression: `$.{
                       "id": mediaId,
                       "label": mediaName
@@ -161,7 +163,8 @@ const MenuCommandSchema: BaseCommandSchema = {
           name: "Info Media",
           type: "dropdown",
           valueType: "api",
-          apiPath: "http://localhost:8080/public/media",
+          apiPath:
+            "https://api-dev-cec.unitel.mn:8000/architect/v2/public/media",
           expression: `$.{
                       "id": mediaId,
                       "label": mediaName
@@ -200,7 +203,8 @@ const MenuCommandSchema: BaseCommandSchema = {
           name: "Media File",
           type: "dropdown",
           valueType: "api",
-          apiPath: "http://localhost:8080/public/media",
+          apiPath:
+            "https://api-dev-cec.unitel.mn:8000/architect/v2/public/media",
           expression: `$.{
                       "id": mediaId,
                       "label": mediaName
@@ -234,7 +238,8 @@ const MenuCommandSchema: BaseCommandSchema = {
           name: "Media File",
           type: "dropdown",
           valueType: "api",
-          apiPath: "http://localhost:8080/public/media",
+          apiPath:
+            "https://api-dev-cec.unitel.mn:8000/architect/v2/public/media",
           expression: `$.{
                       "id": mediaId,
                       "label": mediaName
@@ -343,7 +348,8 @@ const RecordVoicemailCommandSchema: BaseCommandSchema = {
           name: "Media File",
           type: "dropdown",
           valueType: "api",
-          apiPath: "http://localhost:8080/public/media",
+          apiPath:
+            "https://api-dev-cec.unitel.mn:8000/architect/v2/public/media",
           expression: `$.{
                       "id": mediaId,
                       "label": mediaName
