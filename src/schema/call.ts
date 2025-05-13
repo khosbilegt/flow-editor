@@ -1,19 +1,9 @@
 import { BaseCommandSchema } from "./generic";
 
-const CallTransferCommandSchema: BaseCommandSchema = {
-  command: "TransferCommand",
-  type: "TRANSFER_COMMAND",
+const TransferCallToAgentCommandSchema: BaseCommandSchema = {
+  command: "TransferCallToAgentCommand",
+  type: "TRANSFER_CALL_TO_AGENT",
   fields: {
-    transferType: {
-      key: "transferType",
-      name: "Transfer Type",
-      type: "dropdown",
-      valueType: "static",
-      values: {
-        AGENT: "Agent",
-        QUEUE: "Queue",
-      },
-    },
     agentId: {
       key: "agentId",
       name: "Agent ID",
@@ -27,32 +17,19 @@ const CallTransferCommandSchema: BaseCommandSchema = {
                     "label": $v.username
                   }
                 })`,
-      condition: {
-        field: "transferType",
-        type: "equals",
-        equals: "AGENT",
-      },
     },
-    queueId: {
-      key: "queueId",
-      name: "Queue ID",
+    agentType: {
+      key: "agentType",
+      name: "Agent Type",
       type: "dropdown",
-      apiPath: "https://api-dev-cec.unitel.mn:8000/architect/v2/public/queue",
-      valueType: "api",
-      expression: `$map($, function($v) {
-                  {
-                    "id": $v.queueId,
-                    "label": $v.queueName
-                  }
-                })`,
-      condition: {
-        field: "transferType",
-        type: "equals",
-        equals: "QUEUE",
+      valueType: "static",
+      values: {
+        MOBILE: "Mobile",
+        WEBRTC: "WebRTC",
       },
     },
-    timeout: {
-      key: "timeout",
+    dialTimeout: {
+      key: "dialTimeout",
       name: "Timeout",
       type: "number",
     },
@@ -87,14 +64,84 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       ],
     },
   },
+};
+
+const TransferCallToQueueCommandSchema: BaseCommandSchema = {
+  command: "TransferCallToQueueCommand",
+  type: "TRANSFER_CALL_TO_QUEUE",
+  fields: {
+    queueId: {
+      key: "queueId",
+      name: "Queue ID",
+      type: "dropdown",
+      valueType: "api",
+      apiPath: "https://api-dev-cec.unitel.mn:8000/architect/v2/public/queue",
+      expression: `$map($, function($v) {
+                  {
+                    "id": $v.queueId,
+                    "label": $v.queueName
+                  }
+                })`,
+    },
+    agentType: {
+      key: "agentType",
+      name: "Agent Type",
+      type: "dropdown",
+      valueType: "static",
+      values: {
+        MOBILE: "Mobile",
+        WEBRTC: "WebRTC",
+      },
+    },
+
+    dialTimeout: {
+      key: "dialTimeout",
+      name: "Timeout",
+      type: "number",
+    },
+    queueTimeout: {
+      key: "queueTimeout",
+      name: "Queue Timeout",
+      type: "number",
+    },
+  },
   edges: {
-    onTimeout: {
+    onQueueTimeout: {
       name: "onTimeout",
       color: "#00FF00",
+    },
+    onDialTimeout: {
+      name: "onDialTimeout",
+      color: "#FF0000",
     },
     onFailure: {
       name: "onFailure",
       color: "#FF0000",
+    },
+    onClosed: {
+      name: "onClosed",
+      color: "#FF0000",
+    },
+  },
+};
+
+const TransferCallToFlowCommandSchema: BaseCommandSchema = {
+  command: "TransferCallToFlowCommand",
+  type: "TRANSFER_CALL_TO_FLOW",
+  fields: {
+    flowId: {
+      key: "flowId",
+      name: "Flow ID",
+      type: "dropdown",
+      valueType: "api",
+      apiPath:
+        "https://api-dev-cec.unitel.mn:8000/architect/v2/public/flow?limit=1000",
+      expression: `$map($, function($v) {
+                  {
+                    "id": $v.flowId,
+                    "label": $v.flowName
+                  }
+                })`,
     },
   },
 };
@@ -426,7 +473,9 @@ const CollectDTMFCommandSchema: BaseCommandSchema = {
 };
 
 export {
-  CallTransferCommandSchema,
+  TransferCallToAgentCommandSchema,
+  TransferCallToQueueCommandSchema,
+  TransferCallToFlowCommandSchema,
   PlayMediaCommandSchema,
   HangupCommandSchema,
   MenuCommandSchema,

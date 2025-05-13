@@ -152,7 +152,6 @@ function App({
         commands: commandMap,
         definitionVersion: initialVersion,
       };
-      console.log(updatedDefinition);
       updateFlowHandler({
         flowId: flowIdRef.current,
         data: updatedDefinition,

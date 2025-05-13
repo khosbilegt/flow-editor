@@ -36,7 +36,6 @@ function AppWrapper() {
     if (handlerId) {
       setHandlerId(handlerId);
     }
-    console.log("HERE", flowId, version, handlerId);
   }, []);
 
   const store = createStore(false);

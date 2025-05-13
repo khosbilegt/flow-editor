@@ -1,11 +1,13 @@
 import { FlowValidationError } from "./architect";
 import {
-  CallTransferCommandSchema,
   CollectDTMFCommandSchema,
   HangupCommandSchema,
   MenuCommandSchema,
   PlayMediaCommandSchema,
   RecordVoicemailCommandSchema,
+  TransferCallToAgentCommandSchema,
+  TransferCallToFlowCommandSchema,
+  TransferCallToQueueCommandSchema,
 } from "./call";
 
 type APIParam = {
@@ -409,7 +411,9 @@ const SetVariableCommandSchema: BaseCommandSchema = {
 
 const commandList: BaseCommandSchema[] = [
   RestAPICommandSchema,
-  CallTransferCommandSchema,
+  TransferCallToAgentCommandSchema,
+  TransferCallToFlowCommandSchema,
+  TransferCallToQueueCommandSchema,
   PlayMediaCommandSchema,
   HangupCommandSchema,
   CheckConditionCommandSchema,
