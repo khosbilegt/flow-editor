@@ -8,20 +8,20 @@ function MicroWrapper({
   initialHandlerId,
   navigateTo,
 }: {
-  flowId: number;
-  initialVersion: string;
-  initialHandlerId: string;
-  navigateTo: (flowId: number, version: string, handlerId: string) => void;
+  flowId?: number;
+  initialVersion?: string;
+  initialHandlerId?: string;
+  navigateTo?: (flowId: number, version: string, handlerId: string) => void;
 }) {
   const store = createStore(true);
 
   return (
     <Provider store={store}>
       <App
-        flowId={flowId}
-        initialVersion={initialVersion}
-        initialHandlerId={initialHandlerId}
-        navigateTo={navigateTo}
+        flowId={flowId ? flowId : 1}
+        initialVersion={initialVersion ? initialVersion : "Initial"}
+        initialHandlerId={initialHandlerId ? initialHandlerId : "Main"}
+        navigateTo={navigateTo ? navigateTo : () => {}}
       />
     </Provider>
   );

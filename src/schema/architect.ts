@@ -16,6 +16,7 @@ interface FlowHandler {
   handlerId: string;
   handlerName: string;
   initialCommandId: string;
+  definitionVersion: string;
   lastModifiedDate: string;
   errorCount: number;
   referencedHandlers: FlowHandler[];

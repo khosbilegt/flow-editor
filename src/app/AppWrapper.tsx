@@ -15,7 +15,7 @@ function AppWrapper() {
 
   const navigateTo = (flowId: number, version: string, handlerId: string) => {
     const path = `/${flowId}/${version}/${handlerId}`;
-    window.history.replaceState({}, "", path);
+    window.location.href = path;
     setFlowId(flowId);
     setVersion(version);
     setHandlerId(handlerId);
@@ -36,6 +36,7 @@ function AppWrapper() {
     if (handlerId) {
       setHandlerId(handlerId);
     }
+    console.log("HERE", flowId, version, handlerId);
   }, []);
 
   const store = createStore(false);

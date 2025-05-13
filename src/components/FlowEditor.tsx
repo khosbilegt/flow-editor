@@ -101,6 +101,25 @@ function FlowEditor({
       );
       return updatedEdges;
     });
+    setCommands((prev) =>
+      prev.map((prevCommand: FlowCommand) => {
+        if (prevCommand.id === params.source) {
+          const updatedEdges = {
+            ...prevCommand.edges,
+            [params.sourceHandle ?? ""]: {
+              id: params.sourceHandle,
+              type: "flow",
+              target: params.target,
+            },
+          };
+          return {
+            ...prevCommand,
+            edges: updatedEdges,
+          };
+        }
+        return prevCommand;
+      })
+    );
     setEdgeConnectParams(params);
   }, []);
 

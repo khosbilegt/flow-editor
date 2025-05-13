@@ -147,11 +147,12 @@ function App({
         commandMap[command.id] = formattedCommand;
         delete commandMap[command.id].edges;
       });
-      console.log("Updated", commandMap);
       let updatedDefinition: FlowHandler = {
         ...selectedHandlerRef.current,
         commands: commandMap,
+        definitionVersion: initialVersion,
       };
+      console.log(updatedDefinition);
       updateFlowHandler({
         flowId: flowIdRef.current,
         data: updatedDefinition,
@@ -180,6 +181,7 @@ function App({
     dispatch(setFlowId(Number(flowId)));
     dispatch(setHandlerId(initialHandlerId));
     dispatch(setSelectedVersion(initialVersion));
+    console.log("Changed", selectedVersion);
   }, [flowId, initialHandlerId, initialVersion]);
 
   useEffect(() => {
