@@ -9,11 +9,11 @@
     "build:dev": "tsc -b && vite build --mode dev",
     "build:prod": "tsc -b && vite build --mode prod",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview --mode dev"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
-    "@module-federation/vite": "^1.2.7",
+    "@originjs/vite-plugin-federation": "^1.4.1",
     "@reduxjs/toolkit": "^2.7.0",
     "@tailwindcss/vite": "^4.1.4",
     "@xyflow/react": "^12.5.6",

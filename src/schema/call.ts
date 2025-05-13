@@ -19,8 +19,14 @@ const CallTransferCommandSchema: BaseCommandSchema = {
       name: "Agent ID",
       type: "dropdown",
       valueType: "api",
-      apiPath: "https://api-dev-cec.unitel.mn:8000/architect/v2/api/agents",
-      expression: "$",
+      apiPath:
+        "https://api-dev-cec.unitel.mn:8000/wfm/v1/public/user/search?limit=1000",
+      expression: `$map($, function($v) {
+                  {
+                    "id": $v.userId,
+                    "label": $v.username
+                  }
+                })`,
       condition: {
         field: "transferType",
         type: "equals",

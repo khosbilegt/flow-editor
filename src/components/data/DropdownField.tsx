@@ -100,6 +100,10 @@ function DropdownField({
       showSearch
       value={value}
       onChange={setValue}
+      filterOption={(input, option) => {
+        const children = option?.children?.toString().toLowerCase();
+        return children ? children.includes(input.toLowerCase()) : false;
+      }}
       status={error !== null && error !== undefined ? "error" : undefined}
       style={{ width: "100%", minWidth: "150px" }}
     >
