@@ -10,6 +10,7 @@ import TextField from "./data/TextField";
 import MapField from "./data/MapField";
 import ObjectField from "./data/ObjectField";
 import { FlowValidationError } from "@/schema/architect";
+import ExpressionField from "./data/ExpressionField";
 
 const { Text } = Typography;
 
@@ -89,6 +90,18 @@ function FlowData({
             <Form.Item key={key} label={field.name}>
               {field.type === "string" && (
                 <StringField
+                  value={localData[field.key]}
+                  setValue={(val: string) => {
+                    setLocalData({
+                      ...localData,
+                      [field.key]: val,
+                    });
+                  }}
+                  error={localErrors[field.key]}
+                />
+              )}
+              {field.type === "expression" && (
+                <ExpressionField
                   value={localData[field.key]}
                   setValue={(val: string) => {
                     setLocalData({

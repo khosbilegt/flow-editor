@@ -1,3 +1,5 @@
+// This file is for preview purposes for what the schema is capable of parsing.
+
 import { BaseCommandSchema } from "./generic";
 
 const TransferCallToAgentCommandSchema: BaseCommandSchema = {

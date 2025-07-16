@@ -7,6 +7,7 @@ import MapField from "./MapField";
 import ArrayField from "./ArrayField";
 import DropdownField from "./DropdownField";
 import { FlowValidationError } from "@/schema/architect";
+import ExpressionField from "./ExpressionField";
 
 function ObjectField({
   object,
@@ -38,6 +39,20 @@ function ObjectField({
                   error={error}
                 />
               );
+            case "expression":
+              return (
+                <ExpressionField
+                  key={index}
+                  value={object[field.key]}
+                  setValue={(value) => {
+                    setObject({
+                      ...object,
+                      [field.key]: value,
+                    });
+                  }}
+                  error={error}
+                />
+              )
             case "number":
               return (
                 <NumberField

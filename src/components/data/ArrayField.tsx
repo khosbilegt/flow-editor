@@ -7,6 +7,7 @@ import DropdownField from "./DropdownField";
 import ObjectField from "./ObjectField";
 import { Field } from "@/schema/generic";
 import { FlowValidationError } from "@/schema/architect";
+import ExpressionField from "./ExpressionField";
 
 function ArrayField({
   itemType,
@@ -29,6 +30,19 @@ function ArrayField({
             case "string":
               return (
                 <StringField
+                  key={index}
+                  value={item}
+                  setValue={(value) => {
+                    const newItems = [...items];
+                    newItems[index] = value;
+                    setItems(newItems);
+                  }}
+                  error={error}
+                />
+              );
+            case "expression":
+              return (
+                <ExpressionField
                   key={index}
                   value={item}
                   setValue={(value) => {

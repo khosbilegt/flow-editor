@@ -7,6 +7,7 @@ import { FlowValidationError } from "@/schema/architect";
 import ObjectField from "./ObjectField";
 import { Field } from "@/schema/generic";
 import ArrayField from "./ArrayField";
+import ExpressionField from "./ExpressionField";
 
 function MapField({
   keyType,
@@ -33,6 +34,21 @@ function MapField({
             case "string": {
               return (
                 <StringField
+                  key={index}
+                  value={object[key]}
+                  setValue={(value) => {
+                    setObject({
+                      ...object,
+                      [key]: value,
+                    });
+                  }}
+                  error={error}
+                />
+              );
+            }
+            case "expression": {
+              return (
+                <ExpressionField
                   key={index}
                   value={object[key]}
                   setValue={(value) => {

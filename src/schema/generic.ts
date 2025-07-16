@@ -43,8 +43,9 @@ type Field =
         | "map"
         | "array"
         | "dropdown"
-        | "object";
-      type: "string" | "number" | "boolean" | "map" | "array" | "text";
+        | "object"
+        | "expression";
+      type: "string" | "number" | "boolean" | "map" | "array" | "text" | "expression";
       fields?: Field[];
       condition?: Condition;
       isExpression?: boolean;
@@ -67,7 +68,8 @@ type Field =
         | "map"
         | "array"
         | "dropdown"
-        | "object";
+        | "object"
+        | "expression";
       keyType?: "string" | "number";
       items: Field;
       fields: Field[];
@@ -117,7 +119,7 @@ const MakePostCommandSchema: BaseCommandSchema = {
     url: {
       key: "message",
       name: "Message",
-      type: "string",
+      type: "expression",
    },
   },
   edges: {
@@ -173,7 +175,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
         {
           key: "expression",
           name: "Value",
-          type: "string",
+          type: "expression",
         },
       ],
     },
@@ -191,7 +193,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
         {
           key: "expression",
           name: "Value",
-          type: "string",
+          type: "expression",
         },
       ],
     },
@@ -209,7 +211,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
         {
           key: "expression",
           name: "Value",
-          type: "string",
+          type: "expression",
         },
       ],
     },
@@ -244,7 +246,7 @@ const RestAPICommandSchema: BaseCommandSchema = {
             {
               key: "expression",
               name: "Value",
-              type: "string",
+              type: "expression",
             },
           ],
         },
@@ -276,7 +278,7 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
       key: "expression",
       name: "Expression",
       isExpression: true,
-      type: "string",
+      type: "expression",
     },
   },
   edges: {
@@ -291,43 +293,6 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
   },
 };
 
-// const JumpCommandSchema: BaseCommandSchema = {
-//   command: "Jump to Handler",
-//   type: "JUMP",
-//   description: "Start executing another handler",
-//   fields: {
-//     target: {
-//       key: "handlerId",
-//       name: "Target",
-//       type: "dropdown",
-//       valueType: "api",
-//       apiPath:
-//         "https://api-dev-cec.unitel.mn:8000/architect/v2/public/flow/${flowId}/handler/list?version=${version}",
-//       params: [
-//         {
-//           key: "flowId",
-//           type: "number",
-//           source: "inject",
-//           injectKey: "flowId",
-//         },
-//         {
-//           key: "version",
-//           type: "string",
-//           source: "inject",
-//           injectKey: "selectedVersion",
-//         },
-//       ],
-//       expression: `$map($, function($v) {
-//                   {
-//                     "id": $v.handlerId,
-//                     "label": $v.handlerName ? $v.handlerName : $v.handlerId
-//                   }
-//                 })`,
-//     },
-//   },
-// };
-
-
 const SetVariableCommandSchema: BaseCommandSchema = {
   command: "Set Variable",
   type: "SET_CONTEXT_VARIABLE",
@@ -341,7 +306,7 @@ const SetVariableCommandSchema: BaseCommandSchema = {
     variableValue: {
       key: "expression",
       name: "Expression",
-      type: "string",
+      type: "expression",
     },
   },
   edges: {
