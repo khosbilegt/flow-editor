@@ -1,14 +1,4 @@
 import { FlowValidationError } from "./architect";
-import {
-  CollectDTMFCommandSchema,
-  HangupCommandSchema,
-  MenuCommandSchema,
-  PlayMediaCommandSchema,
-  RecordVoicemailCommandSchema,
-  TransferCallToAgentCommandSchema,
-  TransferCallToFlowCommandSchema,
-  TransferCallToQueueCommandSchema,
-} from "./call";
 
 type APIParam = {
   key: string;
@@ -105,6 +95,7 @@ type Field =
 interface BaseCommandSchema {
   command: string;
   type: string;
+  description?: string;
   fields: Record<string, Field>;
   edges?: Record<string, SchemaEdge>;
 }
@@ -118,9 +109,41 @@ interface EditNodeData {
   errors: FlowValidationError[];
 }
 
+const MakePostCommandSchema: BaseCommandSchema = {
+  command: "Make Facebook Post",
+  type: "MAKE_POST",
+  description: "Make a post on Facebook",
+  fields: {
+    url: {
+      key: "url",
+      name: "URL",
+      type: "string",
+      valueType: "static",
+      values: {
+        "https://api-dev-cec.unitel.mn:8000/architect/v2/public/flow/${flowId}/handler/list?version=${version}": "Get Flow Handlers",
+      },
+   },
+  },
+  edges: {
+    onSuccess: {
+      name: "onSuccess",
+      color: "#389E0D",
+    },
+    onTimeout: {
+      name: "onTimeout",
+      color: "#FAAD14",
+    },
+    onFailure: {
+      name: "onFailure",
+      color: "#D32029",
+    },
+  },
+}
+
 const RestAPICommandSchema: BaseCommandSchema = {
-  command: "APICallCommand",
+  command: "API Call",
   type: "API_CALL",
+  description: "Make an API call",
   fields: {
     restClientId: {
       key: "restClientId",
@@ -146,17 +169,6 @@ const RestAPICommandSchema: BaseCommandSchema = {
         PATCH: "PATCH",
       },
     },
-    // authorization: {
-    //   key: "authorization",
-    //   name: "Authorization Type",
-    //   type: "dropdown",
-    //   valueType: "static",
-    //   values: {
-    //     none: "None",
-    //     basic: "Basic",
-    //     bearer: "Bearer",
-    //   },
-    // },
     queryParams: {
       key: "queryParams",
       name: "Query Parameters",
@@ -286,8 +298,9 @@ const RestAPICommandSchema: BaseCommandSchema = {
 };
 
 const CheckConditionCommandSchema: BaseCommandSchema = {
-  command: "CheckConditionCommand",
+  command: "Check Condition",
   type: "CHECK_CONDITION",
+  description: "Check a condition",
   fields: {
     expression: {
       key: "expression",
@@ -329,8 +342,9 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
 };
 
 const JumpCommandSchema: BaseCommandSchema = {
-  command: "JumpCommand",
+  command: "Jump to Handler",
   type: "JUMP",
+  description: "Start executing another handler",
   fields: {
     target: {
       key: "handlerId",
@@ -363,32 +377,11 @@ const JumpCommandSchema: BaseCommandSchema = {
   },
 };
 
-const SendMessageCommandSchema: BaseCommandSchema = {
-  command: "SendMessageCommand",
-  type: "SEND_MESSAGE",
-  fields: {
-    source: {
-      key: "source",
-      name: "Source",
-      type: "string",
-    },
-    message: {
-      key: "message",
-      name: "Message",
-      type: "string",
-    },
-  },
-  edges: {
-    onSuccess: {
-      name: "onSuccess",
-      color: "#389E0D",
-    },
-  },
-};
 
 const SetVariableCommandSchema: BaseCommandSchema = {
-  command: "SetVariableCommand",
+  command: "Set Variable",
   type: "SET_CONTEXT_VARIABLE",
+  description: "Set a variable in the context of the flow",
   fields: {
     variableName: {
       key: "variableName",
@@ -411,18 +404,10 @@ const SetVariableCommandSchema: BaseCommandSchema = {
 
 const commandList: BaseCommandSchema[] = [
   RestAPICommandSchema,
-  TransferCallToAgentCommandSchema,
-  TransferCallToFlowCommandSchema,
-  TransferCallToQueueCommandSchema,
-  PlayMediaCommandSchema,
-  HangupCommandSchema,
   CheckConditionCommandSchema,
   JumpCommandSchema,
-  SendMessageCommandSchema,
   SetVariableCommandSchema,
-  MenuCommandSchema,
-  RecordVoicemailCommandSchema,
-  CollectDTMFCommandSchema,
+  MakePostCommandSchema,
 ];
 
 const getSchemaByCommand = (type: string): BaseCommandSchema | null => {

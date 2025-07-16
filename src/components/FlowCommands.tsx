@@ -45,7 +45,7 @@ function FlowCommands({
                 }}
               >
                 <Title level={4}>{schema.command}</Title>
-                <Text type="secondary">Lorem ipsum dolores</Text>
+                <Text type="secondary">{schema?.description}</Text>
               </Card>
             </List.Item>
           );
