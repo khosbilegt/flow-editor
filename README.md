@@ -89,6 +89,7 @@ src/
 
 - **Node Types & Fields**: Extend `src/schema/generic.ts` to add new command types or field types.
 - **API Endpoints**: Configure API URLs in your environment variables.
+- **See Complex Use Cases**: For an example of complex use cases, read [`src/schema/call.ts`](src/schema/call.ts).
 
 ## License
 
