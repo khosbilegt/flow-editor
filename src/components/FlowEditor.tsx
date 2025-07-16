@@ -362,6 +362,9 @@ function FlowEditor({
         onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        onPaneClick={() => {
+          setCreateCommandDrawerOpen(true);
+        }}
         onNodeDragStop={() => setCommands(updateCommandPositions(commands))}
         attributionPosition="bottom-right"
       >

@@ -104,6 +104,7 @@ export default memo(
           />
           <Handle type="target" position={Position.Left} />
           <Flex vertical gap={10}>
+            {Object.keys(schema.edges || {}).length == 0 && <Typography.Text type="secondary">No outgoing edges</Typography.Text>}
             {Object.keys(schema.edges || {}).map((key, index) => {
               const edge = schema.edges?.[key] as SchemaEdge;
               return (

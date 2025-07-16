@@ -115,13 +115,9 @@ const MakePostCommandSchema: BaseCommandSchema = {
   description: "Make a post on Facebook",
   fields: {
     url: {
-      key: "url",
-      name: "URL",
+      key: "message",
+      name: "Message",
       type: "string",
-      valueType: "static",
-      values: {
-        "https://api-dev-cec.unitel.mn:8000/architect/v2/public/flow/${flowId}/handler/list?version=${version}": "Get Flow Handlers",
-      },
    },
   },
   edges: {
@@ -145,16 +141,10 @@ const RestAPICommandSchema: BaseCommandSchema = {
   type: "API_CALL",
   description: "Make an API call",
   fields: {
-    restClientId: {
-      key: "restClientId",
-      name: "Rest Client ID",
-      type: "dropdown",
-      valueType: "api",
-      apiPath: "https://api-dev-cec.unitel.mn:8000/architect/v2/public/client",
-      expression: `$.{
-                      "id": restClientId,
-                      "label": restClientName
-                    }`,
+    url: {
+      key: "url",
+      name: "URL",
+      type: "string",
     },
     method: {
       key: "method",
@@ -233,26 +223,6 @@ const RestAPICommandSchema: BaseCommandSchema = {
       name: "Timeout",
       type: "number",
     },
-    dataObjects: {
-      key: "dataObjects",
-      name: "Data Objects",
-      type: "array",
-      itemType: "dropdown",
-      items: {
-        key: "dataObject",
-        name: "Data Object",
-        type: "dropdown",
-        valueType: "api",
-        apiPath:
-          "https://api-dev-cec.unitel.mn:8000/architect/v2/public/data-object",
-        expression: `$map($, function($v) {
-                  {
-                    "id": $v.objectId,
-                    "label": $v.objectName
-                  }
-                })`,
-      },
-    },
     responseHandler: {
       key: "responseHandler",
       name: "Response Handlers",
@@ -308,26 +278,6 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
       isExpression: true,
       type: "string",
     },
-    dataObjects: {
-      key: "dataObjects",
-      name: "Data Objects",
-      type: "array",
-      itemType: "dropdown",
-      items: {
-        key: "dataObject",
-        name: "Data Object",
-        type: "dropdown",
-        valueType: "api",
-        apiPath:
-          "https://api-dev-cec.unitel.mn:8000/architect/v2/public/data-object",
-        expression: `$map($, function($v) {
-                  {
-                    "id": $v.objectId,
-                    "label": $v.objectName
-                  }
-                })`,
-      },
-    },
   },
   edges: {
     onTrue: {
@@ -341,41 +291,41 @@ const CheckConditionCommandSchema: BaseCommandSchema = {
   },
 };
 
-const JumpCommandSchema: BaseCommandSchema = {
-  command: "Jump to Handler",
-  type: "JUMP",
-  description: "Start executing another handler",
-  fields: {
-    target: {
-      key: "handlerId",
-      name: "Target",
-      type: "dropdown",
-      valueType: "api",
-      apiPath:
-        "https://api-dev-cec.unitel.mn:8000/architect/v2/public/flow/${flowId}/handler/list?version=${version}",
-      params: [
-        {
-          key: "flowId",
-          type: "number",
-          source: "inject",
-          injectKey: "flowId",
-        },
-        {
-          key: "version",
-          type: "string",
-          source: "inject",
-          injectKey: "selectedVersion",
-        },
-      ],
-      expression: `$map($, function($v) {
-                  {
-                    "id": $v.handlerId,
-                    "label": $v.handlerName ? $v.handlerName : $v.handlerId
-                  }
-                })`,
-    },
-  },
-};
+// const JumpCommandSchema: BaseCommandSchema = {
+//   command: "Jump to Handler",
+//   type: "JUMP",
+//   description: "Start executing another handler",
+//   fields: {
+//     target: {
+//       key: "handlerId",
+//       name: "Target",
+//       type: "dropdown",
+//       valueType: "api",
+//       apiPath:
+//         "https://api-dev-cec.unitel.mn:8000/architect/v2/public/flow/${flowId}/handler/list?version=${version}",
+//       params: [
+//         {
+//           key: "flowId",
+//           type: "number",
+//           source: "inject",
+//           injectKey: "flowId",
+//         },
+//         {
+//           key: "version",
+//           type: "string",
+//           source: "inject",
+//           injectKey: "selectedVersion",
+//         },
+//       ],
+//       expression: `$map($, function($v) {
+//                   {
+//                     "id": $v.handlerId,
+//                     "label": $v.handlerName ? $v.handlerName : $v.handlerId
+//                   }
+//                 })`,
+//     },
+//   },
+// };
 
 
 const SetVariableCommandSchema: BaseCommandSchema = {
@@ -405,7 +355,6 @@ const SetVariableCommandSchema: BaseCommandSchema = {
 const commandList: BaseCommandSchema[] = [
   RestAPICommandSchema,
   CheckConditionCommandSchema,
-  JumpCommandSchema,
   SetVariableCommandSchema,
   MakePostCommandSchema,
 ];
